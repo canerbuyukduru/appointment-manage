@@ -37,11 +37,13 @@ const loginUser = async (req, res) => {
         if (!existingUser) {
             return res.status(404).json({ message: "User not found" });
         }
+
         // Password comparison logic here
         const isMatch = await bcrypt.compare(password, existingUser.password);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
+       
         // Generate JWT token after successful login
         const token = generateToken(res, existingUser._id);
         // If login is successful, you can return user data or a token
@@ -175,6 +177,28 @@ const getCurrentUser = async (req, res) => {
 };
 
 
+const updateCurrentUser = async (req, res) => {
+  const { full_name, email, phone, password } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Güncelleme işlemleri
+    if (full_name !== undefined) user.full_name = full_name;
+    if (email !== undefined) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (password !== undefined) user.password = await bcrypt.hash(password, 10);
+
+    await user.save();
+    res.status(200).json({ message: "User updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
+};
+
 
 // Adminlerin sahiplerini listelemesi için bir endpoint
 const getOwners = async (req, res) => {
@@ -188,4 +212,4 @@ const getOwners = async (req, res) => {
 
 
 
-export { createUser, loginUser, logOutUser, registerOwner, registerAdmin, getOwners,getCurrentUser};
+export { createUser, loginUser, logOutUser, registerOwner, registerAdmin, getOwners,getCurrentUser,updateCurrentUser};

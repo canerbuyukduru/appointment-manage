@@ -7,12 +7,18 @@ import cookieParser from 'cookie-parser';
 // Routes
 import userRoutes from './routes/userRoutes.js';
 import ownerRoutes from './routes/ownerRoutes.js'; 
-
+import beautyCentersRoutes from './routes/beautyCentersRoutes.js';
+import cors from 'cors';
 dotenv.config();
 
 const app = express();
 connectDB();
 const PORT = process.env.PORT || 5001;
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true, // Eğer cookie/token kullanıyorsan bu da gerekli olabilir
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -22,7 +28,7 @@ app.use(cookieParser());
 // User routes
 app.use("/api/users", userRoutes);
 app.use("/api/owners", ownerRoutes); // Assuming you have an ownerRoutes file
-
+app.use("/api/admin", beautyCentersRoutes); // Assuming beauty centers are managed by owners
 
 
 app.listen(PORT, () => {
