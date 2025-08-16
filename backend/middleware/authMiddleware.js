@@ -31,4 +31,12 @@ const authorizeAdmin = (req, res, next) => {
   }
 };
 
-export { authenticate, authorizeAdmin };
+const authorizeOwner = (req, res, next) => {
+  if (req.user && req.user.role === "owner") {
+    next();
+  } else {
+    res.status(403).json({ message: "Not authorized as an owner" });
+  }
+};
+
+export { authenticate, authorizeAdmin, authorizeOwner };

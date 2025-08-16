@@ -1,78 +1,66 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+
+const workingDaySchema = new mongoose.Schema(
+  {
+    isClosed: { type: Boolean, default: false },
+    open: { type: String, default: "09:00" },
+    close: { type: String, default: "18:00" },
+  },
+  { _id: false }
+);
+
+const holidaySchema = new mongoose.Schema(
+  {
+    date: { type: String, required: true }, // "2025-07-12" gibi
+    reason: { type: String },
+  },
+  { _id: false }
+);
 
 const beautyCenterSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    // address alanı hem eski string hem yeni object olarak desteklenebilir
+
     address: {
-      type: mongoose.Schema.Types.Mixed,
-      required: true
+      type: mongoose.Schema.Types.Mixed, // string veya object olabilir
+      required: true,
     },
+
     phone: { type: String, required: true },
     email: { type: String },
     description: { type: String },
 
-    // Google Maps konumu:
-    // location alanı da Mixed olarak tanımlanabilir (string veya object gelebilir)
     location: {
-      type: mongoose.Schema.Types.Mixed,
-      required: false
+      type: mongoose.Schema.Types.Mixed, // ileride { lat, lng } olabilir
+      required: false,
     },
 
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     isApproved: { type: Boolean, default: false },
 
-    // 📆 Çalışma saatleri:
+    // Çalışma saatleri
     workingHours: {
-      monday: {
-        isClosed: { type: Boolean, default: false },
-        open: { type: String, default: "09:00" },
-        close: { type: String, default: "18:00" }
-      },
-      tuesday: {
-        isClosed: { type: Boolean, default: false },
-        open: { type: String, default: "09:00" },
-        close: { type: String, default: "18:00" }
-      },
-      wednesday: {
-        isClosed: { type: Boolean, default: false },
-        open: { type: String, default: "09:00" },
-        close: { type: String, default: "18:00" }
-      },
-      thursday: {
-        isClosed: { type: Boolean, default: false },
-        open: { type: String, default: "09:00" },
-        close: { type: String, default: "18:00" }
-      },
-      friday: {
-        isClosed: { type: Boolean, default: false },
-        open: { type: String, default: "09:00" },
-        close: { type: String, default: "18:00" }
-      },
-      saturday: {
-        isClosed: { type: Boolean, default: true },
-        open: { type: String, default: "10:00" },
-        close: { type: String, default: "16:00" }
-      },
-      sunday: {
-        isClosed: { type: Boolean, default: true },
-        open: { type: String },
-        close: { type: String }
-      }
+      monday: workingDaySchema,
+      tuesday: workingDaySchema,
+      wednesday: workingDaySchema,
+      thursday: workingDaySchema,
+      friday: workingDaySchema,
+      saturday: workingDaySchema,
+      sunday: workingDaySchema,
     },
 
-    // 🎉 Özel tatiller:
-    customHolidays: [
-      {
-        date: { type: String, required: false }, // ISO date string örn: "2025-07-12"
-        reason: { type: String }
-      }
-    ],
-
-    createdAt: { type: Date, default: Date.now }
-  }
+    // Tatil günleri
+    customHolidays: [holidaySchema],
+  },
+  { timestamps: true }
 );
 
-const BeautyCenter = mongoose.model('BeautyCenter', beautyCenterSchema);
+beautyCenterSchema.index({ ownerId: 1 });
+beautyCenterSchema.index({ isApproved: 1 });
 
+const BeautyCenter = mongoose.model("BeautyCenter", beautyCenterSchema);
 export default BeautyCenter;

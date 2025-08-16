@@ -1,11 +1,11 @@
-import express from 'express';
-import { authenticate } from '../middleware/authMiddleware.js';
-import { getMyBeautyCenter, updateMyBeautyCenter } from '../controllers/ownerController.js';
+import express from "express";
+import { registerOwner, loginOwner, logoutOwner } from "../controllers/ownerController.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").get(authenticate, getMyBeautyCenter);
-
-router.route("/update").put(authenticate, updateMyBeautyCenter);
+router.post("/register", registerOwner);
+router.post("/login", loginOwner);
+router.post("/logout", authenticate, logoutOwner);
 
 export default router;

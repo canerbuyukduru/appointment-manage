@@ -1,62 +1,82 @@
-import BeautyCenter from "../models/beautyCentersModel.js";
+import bcrypt from "bcryptjs";
+import User from "../models/userModel.js";
+import generateToken from "../utils/createToken.js";
 
-const getMyBeautyCenter = async (req, res) => {
-  const owner = req.user;
+// 📌 Owner Register
+export const registerOwner = async (req, res) => {
   try {
-    if (!owner || owner.role !== "owner") {
-      return res.status(403).json({ message: "Access denied. Only owners can access this route." });
+    const { fullName, email, password, phone } = req.body;
+
+    // 1. Email zaten var mı kontrol
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Bu email zaten kayıtlı." });
     }
 
-    // Fetch the beauty center associated with the owner
-    const beautyCenter = await BeautyCenter.findOne({ userId: owner._id });
-    if (!beautyCenter) {
-      return res.status(404).json({ message: "Beauty center not found" });
-    }
-    return res.status(200).json(beautyCenter);
+    // 2. Şifre hashle
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 3. Owner olarak kullanıcı oluştur
+    const owner = new User({
+      fullName,
+      email,
+      phone,
+      password: hashedPassword,
+      role: "owner", // 🔑 burada rolü belirtiyoruz
+    });
+
+    await owner.save();
+
+    res.status(201).json({ message: "Owner kaydı başarıyla oluşturuldu.", owner });
   } catch (error) {
-    console.error("Error fetching beauty center:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Sunucu hatası", error: error.message });
   }
 };
 
-
-const updateMyBeautyCenter = async (req, res) => {
-  const owner = req.user;
-  const {
-    name,
-    location,
-    workingHours,
-    customHolidays,
-    email,
-    description,
-    phone
-  } = req.body;
-
+// 📌 Owner Login
+export const loginOwner = async (req, res) => {
   try {
-    if (!owner || owner.role !== "owner") {
-      return res.status(403).json({ message: "Access denied. Only owners can access this route." });
+    const { email, password } = req.body;
+
+    // Owner var mı kontrol et
+    const owner = await User.findOne({ email, role: "owner" });
+    if (!owner) {
+      return res.status(400).json({ message: "Owner bulunamadı." });
     }
 
-    // Fetch the beauty center associated with the owner
-    const beautyCenter = await BeautyCenter.findOne({ userId: owner._id });
-    if (!beautyCenter) {
-      return res.status(404).json({ message: "Beauty center not found" });
+    // Şifre kontrolü
+    const isMatch = await bcrypt.compare(password, owner.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Geçersiz şifre." });
     }
 
-    // Update the beauty center details
-    if (name !== undefined) beautyCenter.name = name;
-    if (location !== undefined) beautyCenter.location = location;
-    if (workingHours !== undefined) beautyCenter.workingHours = workingHours;
-    if (customHolidays !== undefined) beautyCenter.customHolidays = customHolidays;
-    if (email !== undefined) beautyCenter.email = email;
-    if (description !== undefined) beautyCenter.description = description;
-    if (phone !== undefined) beautyCenter.phone = phone;
-    await beautyCenter.save();
-    return res.status(200).json(beautyCenter);
+    // Token oluşturup cookie olarak set et
+    generateToken(res, owner._id);
+
+    res.status(200).json({
+      message: "Login başarılı",
+      owner: {
+        id: owner._id,
+        fullName: owner.fullName,
+        email: owner.email,
+        phone: owner.phone,
+        role: owner.role,
+      },
+    });
   } catch (error) {
-    console.error("Error updating beauty center:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Sunucu hatası", error: error.message });
   }
 };
 
-export { getMyBeautyCenter, updateMyBeautyCenter };
+export const logoutOwner = async (req, res) => {
+  try {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      expires: new Date(0), // geçmiş bir tarih veriyoruz
+    });
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
