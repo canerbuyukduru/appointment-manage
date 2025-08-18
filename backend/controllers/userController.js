@@ -1,215 +1,135 @@
-import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import asyncHandler from "../middleware/asyncHandler.js";
+import User from "../models/userModel.js";
 import generateToken from "../utils/createToken.js";
-import BeautyCenter from '../models/beautyCentersModel.js';
 
-const createUser = async (req, res) => {
-  const { full_name, email, password, phone, role } = req.body;
+// POST /api/users/register
+// Public
+export const registerUser = asyncHandler(async (req, res) => {
+  let { fullName, email, password, phone } = req.body;
 
-  try {
-    // Email format kontrolü
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Geçerli bir email adresi giriniz.' });
-    }
-    // Email kontrolü
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Bu email zaten kayıtlı.' });
-    }
-
-    // Şifre hashle
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ full_name, email, password: hashedPassword, phone, role });
-    await newUser.save();
-    // Generate JWT token after user creation
-    const token = generateToken(res, newUser._id);
-    res.status(201).json({ message: "User created successfully", user: newUser, token });
-  } catch (error) {
-    res.status(500).json({ message: "Error creating user", error });
-  }
-};
-
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-    try {
-        const existingUser = await User.findOne({ email });
-        if (!existingUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Password comparison logic here
-        const isMatch = await bcrypt.compare(password, existingUser.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-       
-        // Generate JWT token after successful login
-        const token = generateToken(res, existingUser._id);
-        // If login is successful, you can return user data or a token
-        res.status(200).json({ message: "Login successful", user: existingUser, token });
-    } catch (error) {
-        res.status(500).json({ message: "Error logging in", error });
-    }
-}
-
-const  logOutUser = async (req, res) => {
-    res.cookie("jwt", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== "development",
-        sameSite: "strict",
-        maxAge: 0, // Set maxAge to 0 to delete the cookie
-    });
-    res.status(200).json({ message: "User logged out successfully" });
-
-}
-
-const registerOwner = async (req, res) => {
-  try {
-    const {
-      full_name,
-      email,
-      password,
-      phone,
-
-      // Beauty center fields:
-      center_name,
-      address,
-      location,
-      description,
-      center_phone,
-      center_email
-    } = req.body;
-
-    // Email format kontrolü
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Geçerli bir email adresi giriniz.' });
-    }
-    // Email kontrolü
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Bu email zaten kayıtlı.' });
-    }
-
-    // Şifre hashle
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 1. Adım: User kaydı
-    const newUser = await User.create({
-      full_name,
-      email,
-      password: hashedPassword,
-      phone,
-      role: 'owner',
-      isBanned: false
-    });
-
-    // 2. Adım: BeautyCenter kaydı
-    const newCenter = await BeautyCenter.create({
-      name: center_name,
-      address,
-      location,
-      phone: center_phone,
-      email: center_email,
-      description,
-      userId: newUser._id,
-      isApproved: false // Admin onayı gerekecek
-    });
-
-    // JWT token oluştur
-    const token = generateToken(res, newUser._id);
-
-    return res.status(201).json({
-      message: 'Kayıt başarıyla alındı. Onay sürecine gönderildi.',
-      userId: newUser._id,
-      beautyCenterId: newCenter._id,
-      token
-    });
-  } catch (error) {
-    console.error('Register Owner Hatası:', error);
-    res.status(500).json({ message: 'Sunucu hatası. Kayıt yapılamadı.' });
-  }
-};
-
-
-const registerAdmin = async (req, res) => {
-  const { full_name, email, password, phone } = req.body;
-
-  try {
-    // Email format kontrolü
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Geçerli bir email adresi giriniz.' });
-    }
-    // Email kontrolü
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Bu email zaten kayıtlı.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ full_name, email, password: hashedPassword, phone, role: 'admin' });
-    await newUser.save();
-
-    // JWT token oluştur
-    const token = generateToken(res, newUser._id);
-
-    res.status(201).json({ message: "Admin created successfully", user: newUser, token });
-  } catch (error) {
-    res.status(500).json({ message: "Error creating admin", error });
+  if (!fullName || !email || !password || !phone) {
+    res.status(400);
+    throw new Error("fullName, email, password, phone zorunludur");
   }
 
+  email = email.toLowerCase();
 
-};
-
-
-const getCurrentUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select("-password -__v");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching user", error });
+  const existing = await User.findOne({ email });
+  if (existing) {
+    res.status(400);
+    throw new Error("Bu email zaten kayıtlı");
   }
-};
 
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(password, salt);
 
-const updateCurrentUser = async (req, res) => {
-  const { full_name, email, phone, password } = req.body;
+  const user = await User.create({
+    fullName,
+    email,
+    password: hashed,     // modelde alan adı 'password'
+    phone,
+    role: "user"          // müşteri olarak aç
+  });
 
-  try {
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+  // Login olmuş gibi cookie’ye token bas (opsiyonel ama genelde iyi UX)
+  generateToken(res, user._id);
 
-    // Güncelleme işlemleri
-    if (full_name !== undefined) user.full_name = full_name;
-    if (email !== undefined) user.email = email;
-    if (phone !== undefined) user.phone = phone;
-    if (password !== undefined) user.password = await bcrypt.hash(password, 10);
+  res.status(201).json({
+    _id: user._id,
+    full_name: user.full_name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+  });
+});
 
-    await user.save();
-    res.status(200).json({ message: "User updated successfully", user });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating user", error });
+// POST /api/users/login
+// Public
+export const loginUser = asyncHandler(async (req, res) => {
+  let { email, password } = req.body;
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("email ve password zorunludur");
   }
-};
 
+  email = email.toLowerCase();
 
-// Adminlerin sahiplerini listelemesi için bir endpoint
-const getOwners = async (req, res) => {
-  try {
-    const owners = await User.find({ role: 'owner' }).select('-password -__v');
-    res.status(200).json(owners);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching owners", error });
+  const user = await User.findOne({ email, role: "user" });
+  if (!user) {
+    res.status(401);
+    throw new Error("Geçersiz kimlik bilgileri");
   }
-};
 
+  if (user.isBanned) {
+    res.status(403);
+    throw new Error("Hesabınız engellenmiştir");
+  }
 
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    res.status(401);
+    throw new Error("Geçersiz kimlik bilgileri");
+  }
 
-export { createUser, loginUser, logOutUser, registerOwner, registerAdmin, getOwners,getCurrentUser,updateCurrentUser};
+  // Cookie'ye JWT yaz
+  generateToken(res, user._id);
+
+  res.json({
+    message: "Giriş başarılı",
+    user: {
+      _id: user._id,
+      full_name: user.full_name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    },
+  });
+});
+
+// POST /api/users/logout
+// Private (ama istersen public da yapabilirsin)
+export const logoutUser = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.json({ message: "Çıkış yapıldı" });
+});
+
+// GET /api/users/profile
+// Private
+export const getMyProfile = asyncHandler(async (req, res) => {
+  // authenticate middleware: req.user = user ( -password ile )
+  res.json(req.user);
+});
+
+// PUT /api/users/profile
+// Private
+export const updateMyProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    res.status(404);
+    throw new Error("Kullanıcı bulunamadı");
+  }
+
+  // sadece gelen alanları güncelle
+  const { fullName, phone, password } = req.body;
+  if (fullName !== undefined) user.fullName = fullName;
+  if (phone !== undefined) user.phone = phone;
+
+  if (password) {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+  }
+
+  await user.save();
+
+  res.json({
+    _id: user._id,
+    fullName: user.fullName,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+  });
+});

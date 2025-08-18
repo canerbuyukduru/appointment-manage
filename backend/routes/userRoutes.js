@@ -1,18 +1,20 @@
-import express from 'express';
-import {createUser,loginUser,logOutUser,registerAdmin, getOwners ,getCurrentUser, updateCurrentUser} from '../controllers/userController.js';
-import { authenticate, authorizeAdmin } from '../middleware/authMiddleware.js';
+import express from "express";
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+  getMyProfile,
+  updateMyProfile,
+} from "../controllers/userController.js";
+import { authenticate } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-router.route("/").post(createUser);
-router.route("/auth").post(loginUser);
-router.route("/logout").post(logOutUser);
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.post("/logout", authenticate, logoutUser);
 
-
-router.route('/current-user').get(authenticate, getCurrentUser);
-router.route('/current-user/update').put(authenticate, updateCurrentUser);
-
-// Admin Routes
-router.route('/register-admin').post(registerAdmin);
-router.route('/owners').get(authenticate, authorizeAdmin, getOwners);
+router.get("/profile", authenticate, getMyProfile);
+router.put("/profile", authenticate, updateMyProfile);
 
 export default router;

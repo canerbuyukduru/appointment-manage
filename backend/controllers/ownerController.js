@@ -1,6 +1,9 @@
 import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
 import generateToken from "../utils/createToken.js";
+import asyncHandler from "../middleware/asyncHandler.js";
+import Appointment from "../models/appoitmentsModel.js";
+import BeautyCenter from "../models/beautyCentersModel.js";
 
 // 📌 Owner Register
 export const registerOwner = async (req, res) => {
@@ -80,3 +83,112 @@ export const logoutOwner = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+
+export const getOwnerAppointments = asyncHandler(async (req, res) => {
+  // 1) Önce bu owner’ın merkezini bul
+  const center = await BeautyCenter.findOne({ ownerId: req.user._id });
+  if (!center) {
+    res.status(404);
+    throw new Error("Beauty center not found for this owner");
+  }
+
+  // 2) Sonra bu merkeze ait randevuları getir
+  const appointments = await Appointment.find({ beautyCenterId: center._id })
+    .populate("userId", "fullName email phone role")
+    .populate("beautyCenterId", "name address")
+    .populate("departmentId", "name")
+    .populate("serviceId", "name duration price")
+    .sort({ startDateTime: 1 });
+
+  res.json(appointments);
+});
+
+
+const getOwnerCenter = async (ownerId) => {
+  return await BeautyCenter.findOne({ ownerId });
+};
+
+
+export const ownerApproveAppointment = asyncHandler(async (req, res) => {
+  const center = await getOwnerCenter(req.user._id);
+  if (!center) { res.status(404); throw new Error("Beauty center not found"); }
+
+  const appt = await Appointment.findOne({ _id: req.params.id, beautyCenterId: center._id });
+  if (!appt) { res.status(404); throw new Error("Appointment not found"); }
+  if (appt.status !== "pending") {
+    res.status(400); throw new Error("Only pending appointments can be approved");
+  }
+
+  appt.status = "approved";
+  await appt.save();
+
+  res.json({ message: "Appointment approved", appointment: appt });
+});
+export const ownerRejectAppointment = asyncHandler(async (req, res) => {
+  const center = await getOwnerCenter(req.user._id);
+  if (!center) { res.status(404); throw new Error("Beauty center not found"); }
+
+  const appt = await Appointment.findOne({ _id: req.params.id, beautyCenterId: center._id });
+  if (!appt) { res.status(404); throw new Error("Appointment not found"); }
+  if (!["pending","approved"].includes(appt.status)) {
+    res.status(400); throw new Error("This appointment cannot be rejected");
+  }
+
+  appt.status = "rejected";
+  await appt.save();
+
+  res.json({ message: "Appointment rejected", appointment: appt });
+});
+
+
+export const ownerMarkAttendance = asyncHandler(async (req, res) => {
+  const { attended } = req.body;
+
+  if (typeof attended !== "boolean") {
+    res.status(400);
+    throw new Error("attended boolean olmalı (true/false).");
+  }
+
+  const center = await getOwnerCenter(req.user._id);
+  if (!center) {
+    res.status(404);
+    throw new Error("Beauty center bulunamadı.");
+  }
+
+  // Randevu sadece bu merkeze aitse bulunur
+  const appt = await Appointment.findOne({
+    _id: req.params.id,
+    beautyCenterId: center._id,
+  });
+
+  if (!appt) {
+    res.status(404);
+    throw new Error("Randevu bulunamadı.");
+  }
+
+  // Yalnızca onaylı (veya daha önce işaretlenmiş) randevular işaretlenebilir
+  if (!["approved", "completed", "no-show"].includes(appt.status)) {
+    res.status(400);
+    throw new Error("Sadece onaylı veya daha önce işaretlenmiş randevular güncellenebilir.");
+  }
+
+  // Gelecek zaman kısıtı (en azından randevu başlamış olmalı)
+  const now = new Date();
+  if (appt.startDateTime > now) {
+    res.status(400);
+    throw new Error("Randevu başlamadan attendance işaretlenemez.");
+  }
+  // İstersen daha sıkı: if (appt.endDateTime > now) { throw new Error("Randevu bitmeden işaretlenemez."); }
+
+  appt.attended = attended;
+  appt.status = attended ? "completed" : "no-show";
+
+  await appt.save();
+
+  res.json({
+    message: attended ? "Randevu tamamlandı olarak işaretlendi." : "Randevu no-show olarak işaretlendi.",
+    appointment: appt,
+  });
+});

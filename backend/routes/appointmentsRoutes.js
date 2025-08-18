@@ -1,16 +1,17 @@
 import express from "express";
+import { authenticate } from "../middleware/authMiddleware.js";
+import { cancelAppointment, createAppointment, getMyAppointments } from "../controllers/appointmentController.js";
 
-import { authenticate, authorizeAdmin } from "../middleware/authMiddleware.js";
-import { cancelAppointment, createAppointment, getAppointmentsByUser } from "../controllers/appointmentController.js";
 const router = express.Router();
 
-// Yeni randevu oluştur
+// Müşteri randevu oluşturur
 router.post("/", authenticate, createAppointment);
 
-// Kullanıcının kendi randevularını getir
-router.get("/my", authenticate, getAppointmentsByUser);
+// Kullanıcının kendi randevularını görüntülemesi
+router.get("/my", authenticate, getMyAppointments);
 
-// Randevu iptal et
+// Kullanıcının kendi randevusunu iptal etmesi
 router.delete("/:id", authenticate, cancelAppointment);
+
 
 export default router;
