@@ -35,6 +35,8 @@ function DashboardContent() {
 
   // Role'e göre icon seç
   const getRoleIcon = (role) => {
+    if (!role) return <User className="text-gray-500" size={24} />
+    
     switch (role) {
       case 'user':
         return <User className="text-blue-500" size={24} />
@@ -49,6 +51,8 @@ function DashboardContent() {
 
   // Role'e göre açıklama
   const getRoleDescription = (role) => {
+    if (!role) return 'Sistemde aktif durumdasınız.'
+    
     switch (role) {
       case 'user':
         return 'Randevu alabilir ve geçmiş randevularını görüntüleyebilirsiniz.'
@@ -84,13 +88,13 @@ function DashboardContent() {
         {/* Welcome Card */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <div className="flex items-center gap-4">
-            {getRoleIcon(user.role)}
+            {getRoleIcon(user?.role)}
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">
-                Hoş geldiniz, {user.fullName}
+                Hoş geldiniz, {user?.fullName || 'Kullanıcı'}
               </h2>
               <p className="text-gray-600 mt-1">
-                {getRoleDescription(user.role)}
+                {getRoleDescription(user?.role)}
               </p>
             </div>
           </div>
@@ -104,21 +108,21 @@ function DashboardContent() {
             <div className="space-y-3">
               <div>
                 <label className="text-sm text-gray-500">Ad Soyad</label>
-                <p className="font-medium">{user.fullName}</p>
+                <p className="font-medium">{user?.fullName || 'Bilinmiyor'}</p>
               </div>
               <div>
                 <label className="text-sm text-gray-500">E-posta</label>
-                <p className="font-medium">{user.email}</p>
+                <p className="font-medium">{user?.email || 'Bilinmiyor'}</p>
               </div>
               <div>
                 <label className="text-sm text-gray-500">Telefon</label>
-                <p className="font-medium">{user.phone}</p>
+                <p className="font-medium">{user?.phone || 'Bilinmiyor'}</p>
               </div>
               <div>
                 <label className="text-sm text-gray-500">Rol</label>
                 <div className="flex items-center gap-2">
-                  {getRoleIcon(user.role)}
-                  <span className="font-medium capitalize">{user.role}</span>
+                  {getRoleIcon(user?.role)}
+                  <span className="font-medium capitalize">{user?.role || 'Bilinmiyor'}</span>
                 </div>
               </div>
             </div>
@@ -128,7 +132,7 @@ function DashboardContent() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Hızlı İşlemler</h3>
             <div className="space-y-2">
-              {user.role === 'user' && (
+              {user?.role === 'user' && (
                 <>
                   <button 
                     onClick={() => router.push('/')}
@@ -137,7 +141,7 @@ function DashboardContent() {
                     📅 Randevu Al
                   </button>
                   <button 
-                    onClick={() => router.push('/appointments')}
+                    onClick={() => router.push('/user/appointments')}
                     className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     📋 Randevularım
@@ -145,7 +149,7 @@ function DashboardContent() {
                 </>
               )}
               
-              {user.role === 'owner' && (
+              {user?.role === 'owner' && (
                 <>
                   <button 
                     onClick={() => router.push('/owner/beauty-center')}
@@ -159,13 +163,16 @@ function DashboardContent() {
                   >
                     📂 Departmanlar
                   </button>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={() => router.push('/owner/appointments')}
+                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     📅 Randevu Yönetimi
                   </button>
                 </>
               )}
               
-              {user.role === 'admin' && (
+              {user?.role === 'admin' && (
                 <>
                   <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
                     👥 Kullanıcı Yönetimi

@@ -157,7 +157,7 @@ function BookingProcess() {
 
       await createAppointment(appointmentData).unwrap()
       toast.success('Randevunuz başarıyla oluşturuldu! Onay bekleniyor.')
-      router.push('/appointments') // Randevularım sayfasına git
+      router.push('/user/appointments') // Randevularım sayfasına git
     } catch (error) {
       console.error('Appointment error:', error)
       toast.error(error.data?.message || 'Randevu oluşturulamadı')

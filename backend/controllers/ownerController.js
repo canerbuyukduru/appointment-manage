@@ -87,22 +87,44 @@ export const logoutOwner = async (req, res) => {
 
 
 export const getOwnerAppointments = asyncHandler(async (req, res) => {
-  // 1) Önce bu owner’ın merkezini bul
+  const { status, date } = req.query; // Query parametrelerini al
+
+  // 1) Önce bu owner'ın merkezini bul
   const center = await BeautyCenter.findOne({ ownerId: req.user._id });
   if (!center) {
     res.status(404);
     throw new Error("Beauty center not found for this owner");
   }
 
-  // 2) Sonra bu merkeze ait randevuları getir
-  const appointments = await Appointment.find({ beautyCenterId: center._id })
+  // 2) Filter objesi oluştur
+  const filter = { beautyCenterId: center._id };
+
+  // Status filtresi
+  if (status && status !== 'all') {
+    filter.status = status;
+  }
+
+  // Tarih filtresi (belirtilen tarih için)
+  if (date) {
+    const selectedDate = new Date(date);
+    const nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    filter.startDateTime = {
+      $gte: selectedDate,
+      $lt: nextDay
+    };
+  }
+
+  // 3) Filtrelenmiş randevuları getir
+  const appointments = await Appointment.find(filter)
     .populate("userId", "fullName email phone role")
-    .populate("beautyCenterId", "name address")
+    .populate("beautyCenterId", "name address location phone")
     .populate("departmentId", "name")
     .populate("serviceId", "name duration price")
-    .sort({ startDateTime: 1 });
+    .sort({ startDateTime: 1 }); // Tarihe göre sırala
 
-  res.json(appointments);
+  res.json({ appointments });
 });
 
 
@@ -110,7 +132,7 @@ const getOwnerCenter = async (ownerId) => {
   return await BeautyCenter.findOne({ ownerId });
 };
 
-
+// kullanılmıyor 
 export const ownerApproveAppointment = asyncHandler(async (req, res) => {
   const center = await getOwnerCenter(req.user._id);
   if (!center) { res.status(404); throw new Error("Beauty center not found"); }
@@ -190,5 +212,42 @@ export const ownerMarkAttendance = asyncHandler(async (req, res) => {
   res.json({
     message: attended ? "Randevu tamamlandı olarak işaretlendi." : "Randevu no-show olarak işaretlendi.",
     appointment: appt,
+  });
+});
+// kullanılmıyor
+
+
+export const updateAppointmentStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status, notes } = req.body;
+  
+  // Owner'ın bu randevuyu güncelleyebilir mi kontrol et
+  const center = await BeautyCenter.findOne({ ownerId: req.user._id });
+  if (!center) {
+    res.status(404);
+    throw new Error("Beauty center not found");
+  }
+
+  const appointment = await Appointment.findOne({ 
+    _id: id, 
+    beautyCenterId: center._id 
+  });
+
+  if (!appointment) {
+    res.status(404);
+    throw new Error("Appointment not found");
+  }
+
+  appointment.status = status;
+  if (notes) {
+    appointment.notes = notes; // Eğer appointment modelinizde notes field'ı varsa
+  }
+
+  await appointment.save();
+
+  res.json({ 
+    success: true, 
+    message: "Appointment status updated",
+    appointment 
   });
 });

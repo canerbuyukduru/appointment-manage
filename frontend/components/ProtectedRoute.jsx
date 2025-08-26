@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
       }
 
       // 2. Role kontrolü (eğer allowedRoles belirtilmişse)
-      if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+      if (allowedRoles.length > 0 && (!user?.role || !allowedRoles.includes(user.role))) {
         console.log('Yetkisiz erişim, dashboard\'a yönlendiriliyor')
         router.push('/dashboard')
         return
