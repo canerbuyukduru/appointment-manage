@@ -12,6 +12,8 @@ import appointmentsRoutes from './routes/appointmentsRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import availabilityRoutes from './routes/availabilityRoutes.js';
+
 
 import cors from 'cors';
 dotenv.config();
@@ -21,7 +23,7 @@ connectDB();
 const PORT = process.env.PORT || 5001;
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'http://localhost:3000',
   credentials: true, // Eğer cookie/token kullanıyorsan bu da gerekli olabilir
 }));
 
@@ -39,6 +41,7 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/appointments", appointmentsRoutes);
 app.use("/api/admin", adminRoutes); 
 
+app.use("/api/availability", availabilityRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

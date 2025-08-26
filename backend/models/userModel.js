@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, required: true },
     role: { type: String, enum: ["user", "owner", "admin"], default: "user" },
     isBanned: { type: Boolean, default: false },
+    isApproved: {type:Boolean,default:false}, // admin için onay 
   },
   { timestamps: true }
 );

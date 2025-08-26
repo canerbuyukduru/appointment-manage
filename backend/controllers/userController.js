@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 import generateToken from "../utils/createToken.js";
+import BeautyCenter from "../models/beautyCentersModel.js";
 
 // POST /api/users/register
 // Public
@@ -79,7 +80,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     message: "Giriş başarılı",
     user: {
       _id: user._id,
-      full_name: user.full_name,
+      fullName: user.fullName,
       email: user.email,
       phone: user.phone,
       role: user.role,
@@ -133,3 +134,24 @@ export const updateMyProfile = asyncHandler(async (req, res) => {
     role: user.role,
   });
 });
+
+export const getAllBeautyCenters = asyncHandler(async (req, res) => {
+  const { search, location } = req.query
+
+  let query = {}
+
+  // 🔎 Arama filtresi (name veya description içinde arama)
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } }
+    ]
+  }
+// location için
+if (location) {
+  query.location = { $regex: location, $options: "i" }
+}
+
+  const beautyCenters = await BeautyCenter.find(query)
+  res.json(beautyCenters)
+})

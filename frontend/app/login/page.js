@@ -42,7 +42,16 @@ export default function LoginPage() {
       }
 
       toast.success(result.message)
-      router.push('/dashboard')
+      
+      // Bekleyen booking var mı kontrol et
+      const pendingBooking = localStorage.getItem('pendingBooking')
+      if (pendingBooking) {
+        const bookingData = JSON.parse(pendingBooking)
+        localStorage.removeItem('pendingBooking')
+        router.push(bookingData.redirectTo)
+      } else {
+        router.push('/dashboard')
+      }
     } catch (error) {
       toast.error(error.data?.message || 'Giriş yapılamadı')
     }
@@ -61,7 +70,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setUserType('user')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all cursor-pointer ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
               userType === 'user'
                 ? 'bg-white shadow-sm text-pink-600'
                 : 'text-gray-600'
@@ -73,7 +82,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setUserType('owner')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all cursor-pointer ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
               userType === 'owner'
                 ? 'bg-white shadow-sm text-pink-600'
                 : 'text-gray-600'

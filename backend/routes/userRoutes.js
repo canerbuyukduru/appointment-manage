@@ -5,6 +5,7 @@ import {
   logoutUser,
   getMyProfile,
   updateMyProfile,
+  getAllBeautyCenters,
 } from "../controllers/userController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 
@@ -16,5 +17,8 @@ router.post("/logout", authenticate, logoutUser);
 
 router.get("/profile", authenticate, getMyProfile);
 router.put("/profile", authenticate, updateMyProfile);
+
+// /api/users/beauty-centers
+router.get("/beauty-centers", getAllBeautyCenters);
 
 export default router;

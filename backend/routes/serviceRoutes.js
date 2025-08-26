@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticate } from "../middleware/authMiddleware.js";
-import { createService, updateService, deleteService } from "../controllers/serviceController.js";
+import { createService, updateService, deleteService, getServicesByDepartment } from "../controllers/serviceController.js";
 
 const router = express.Router();
 
@@ -8,5 +8,7 @@ const router = express.Router();
 router.post("/", authenticate, createService);
 router.put("/:id", authenticate, updateService);
 router.delete("/:id", authenticate, deleteService);
+
+router.get("/department/:departmentId", authenticate, getServicesByDepartment);
 
 export default router;

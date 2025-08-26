@@ -81,3 +81,90 @@ export const adminLogin = asyncHandler(async (req, res) => {
     },
   });
 });
+
+
+// PATCH /api/admin/owners/:id/approve
+export const approveOwner = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const owner = await User.findById(id).select("+role +isApproved");
+  if (!owner) {
+    res.status(404);
+    throw new Error("Owner bulunamadı!");
+  }
+  if (owner.role !== "owner") {
+    res.status(400);
+    throw new Error("Bu kullanıcı owner değil.");
+  }
+  if (owner.isApproved === true) {
+    return res.json({
+      message: "Owner zaten onaylı.",
+      owner: {
+        _id: owner._id,
+        fullName: owner.fullName,
+        email: owner.email,
+        phone: owner.phone,
+        role: owner.role,
+        isApproved: owner.isApproved,
+      },
+    });
+  }
+
+  owner.isApproved = true;
+  await owner.save();
+
+  res.json({
+    message: "Owner onaylandı!",
+    owner: {
+      _id: owner._id,
+      fullName: owner.fullName,
+      email: owner.email,
+      phone: owner.phone,
+      role: owner.role,
+      isApproved: owner.isApproved,
+    },
+  });
+});
+
+// PATCH /api/admin/owners/:id/reject
+export const rejectOwner = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const owner = await User.findById(id).select("+role +isApproved");
+  if (!owner) {
+    res.status(404);
+    throw new Error("Owner bulunamadı!");
+  }
+  if (owner.role !== "owner") {
+    res.status(400);
+    throw new Error("Bu kullanıcı owner değil.");
+  }
+  if (owner.isApproved === false) {
+    return res.json({
+      message: "Owner zaten reddedilmiş/draft durumda.",
+      owner: {
+        _id: owner._id,
+        fullName: owner.fullName,
+        email: owner.email,
+        phone: owner.phone,
+        role: owner.role,
+        isApproved: owner.isApproved,
+      },
+    });
+  }
+
+  owner.isApproved = false;
+  await owner.save();
+
+  res.json({
+    message: "Owner reddedildi!",
+    owner: {
+      _id: owner._id,
+      fullName: owner.fullName,
+      email: owner.email,
+      phone: owner.phone,
+      role: owner.role,
+      isApproved: owner.isApproved,
+    },
+  });
+});

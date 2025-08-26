@@ -1,7 +1,7 @@
 // routes/beautyCenterRoutes.js
 import express from "express";
 import { authenticate, authorizeOwner } from "../middleware/authMiddleware.js";
-import { createBeautyCenter, getMyBeautyCenter, updateMyBeautyCenter } from "../controllers/beautyCentersController.js";
+import { createBeautyCenter, getCenterDepartments, getMyBeautyCenter, updateMyBeautyCenter } from "../controllers/beautyCentersController.js";
 
 const router = express.Router();
 
@@ -13,5 +13,9 @@ router.get("/mine", authenticate, authorizeOwner, getMyBeautyCenter);
 
 // Owner kendi merkezini günceller
 router.put("/mine", authenticate, authorizeOwner, updateMyBeautyCenter);
+
+// Belirli center'ın department'larını getir (public)
+router.get("/:id/departments", getCenterDepartments);
+
 
 export default router;

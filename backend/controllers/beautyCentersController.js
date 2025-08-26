@@ -1,5 +1,6 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import BeautyCenter from "../models/beautyCentersModel.js";
+import Departments from "../models/departmentModel.js";
 // @desc    Create new Beauty Center
 // @route   POST /api/beauty-centers
 // @access  Private (owner only)
@@ -74,4 +75,16 @@ export const updateMyBeautyCenter = asyncHandler(async (req, res) => {
 
   const updatedCenter = await beautyCenter.save();
   res.json(updatedCenter);
+});
+
+export const getCenterDepartments = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const beautyCenter = await BeautyCenter.findById(id);
+  const departments = await Departments.find({ beautyCenterId: id });
+  if (!beautyCenter) {
+    res.status(404);
+    throw new Error("Beauty center not found.");
+  }
+
+  res.json(departments);
 });

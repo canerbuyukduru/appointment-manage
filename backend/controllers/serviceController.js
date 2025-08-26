@@ -56,4 +56,11 @@ const deleteService = asyncHandler(async (req, res) => {
   res.json({ message: "Service deleted successfully" });
 });
 
-export { createService, updateService, deleteService };
+const getServicesByDepartment = asyncHandler(async (req, res) => {
+  const { departmentId } = req.params;
+  const services = await Service.find({ departmentId });
+
+  res.json(services);
+});
+
+export { createService, updateService, deleteService, getServicesByDepartment };

@@ -16,21 +16,25 @@ function DashboardContent() {
 
   // Logout işlemi
   const handleLogout = async () => {
+    console.log('🔄 Logout başlatılıyor...')
     try {
-      await logoutMutation().unwrap()
+      const result = await logoutMutation().unwrap()
+      console.log('✅ Logout API başarılı:', result)
+      
       dispatch(logout())
+      console.log('✅ Redux state temizlendi')
+      
       toast.success('Başarıyla çıkış yapıldı')
       router.push('/login')
     } catch (error) {
-      toast.error('Çıkış yapılamadı')
+      console.error('❌ Logout hatası:', error)
+      console.error('❌ Error details:', error.data)
+      toast.error('Çıkış yapılamadı: ' + (error.data?.message || error.message))
     }
   }
 
   // Role'e göre icon seç
-{
-  if (!user) return null
-}
- const getRoleIcon = (role) => {
+  const getRoleIcon = (role) => {
     switch (role) {
       case 'user':
         return <User className="text-blue-500" size={24} />
@@ -126,10 +130,16 @@ function DashboardContent() {
             <div className="space-y-2">
               {user.role === 'user' && (
                 <>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={() => router.push('/')}
+                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     📅 Randevu Al
                   </button>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={() => router.push('/appointments')}
+                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     📋 Randevularım
                   </button>
                 </>
@@ -137,14 +147,20 @@ function DashboardContent() {
               
               {user.role === 'owner' && (
                 <>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    🏢 İşletme Ayarları
+                  <button 
+                    onClick={() => router.push('/owner/beauty-center')}
+                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    🏢 İşletme Yönetimi
+                  </button>
+                  <button 
+                    onClick={() => router.push('/owner/departments')}
+                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    📂 Departmanlar
                   </button>
                   <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
                     📅 Randevu Yönetimi
-                  </button>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    ⚙️ Hizmetler
                   </button>
                 </>
               )}
