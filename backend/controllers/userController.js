@@ -56,7 +56,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   email = email.toLowerCase();
 
-  const user = await User.findOne({ email, role: "user" });
+  const user = await User.findOne({ email });
   if (!user) {
     res.status(401);
     throw new Error("Geçersiz kimlik bilgileri");
