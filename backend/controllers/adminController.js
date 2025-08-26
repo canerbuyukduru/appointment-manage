@@ -1,7 +1,7 @@
 // controllers/adminController.js
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
-import BeautyCenter from "../models/beautyCentersModel.js"
+import BeautyCenter from "../models/beautyCentersModel.js";
 import Appointment from "../models/appoitmentsModel.js";
 import generateToken from "../utils/createToken.js";
 import bcrypt from "bcryptjs";
@@ -18,21 +18,21 @@ export const getAdminStats = asyncHandler(async (req, res) => {
     totalCenters,
     totalAppointments,
     todayAppointments,
-    bannedUsers
+    bannedUsers,
   ] = await Promise.all([
-    User.countDocuments({ role: { $ne: 'admin' } }),
-    User.countDocuments({ role: 'owner' }),
-    User.countDocuments({ role: 'owner', isApproved: false }),
-    User.countDocuments({ role: 'owner', isApproved: true }),
+    User.countDocuments({ role: { $ne: "admin" } }),
+    User.countDocuments({ role: "owner" }),
+    User.countDocuments({ role: "owner", isApproved: false }),
+    User.countDocuments({ role: "owner", isApproved: true }),
     BeautyCenter.countDocuments(),
     Appointment.countDocuments(),
     Appointment.countDocuments({
       startDateTime: {
         $gte: new Date().setHours(0, 0, 0, 0),
-        $lt: new Date().setHours(23, 59, 59, 999)
-      }
+        $lt: new Date().setHours(23, 59, 59, 999),
+      },
     }),
-    User.countDocuments({ isBanned: true })
+    User.countDocuments({ isBanned: true }),
   ]);
 
   // Son 7 günün randevu istatistikleri
@@ -42,14 +42,14 @@ export const getAdminStats = asyncHandler(async (req, res) => {
     date.setDate(date.getDate() - i);
     const startOfDay = new Date(date.setHours(0, 0, 0, 0));
     const endOfDay = new Date(date.setHours(23, 59, 59, 999));
-    
+
     const appointmentCount = await Appointment.countDocuments({
-      startDateTime: { $gte: startOfDay, $lte: endOfDay }
+      startDateTime: { $gte: startOfDay, $lte: endOfDay },
     });
-    
+
     last7Days.push({
-      date: startOfDay.toISOString().split('T')[0],
-      appointments: appointmentCount
+      date: startOfDay.toISOString().split("T")[0],
+      appointments: appointmentCount,
     });
   }
 
@@ -64,8 +64,8 @@ export const getAdminStats = asyncHandler(async (req, res) => {
       totalAppointments,
       todayAppointments,
       bannedUsers,
-      last7Days
-    }
+      last7Days,
+    },
   });
 });
 
@@ -73,13 +73,13 @@ export const getAdminStats = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/owners/pending
 // @access  Private/Admin
 export const getPendingOwners = asyncHandler(async (req, res) => {
-  const pendingOwners = await User.find({ 
-    role: 'owner', 
+  const pendingOwners = await User.find({
+    role: "owner",
     isApproved: false,
-    isBanned: false 
+    isBanned: false,
   })
-  .select('-password')
-  .sort({ createdAt: -1 });
+    .select("-password")
+    .sort({ createdAt: -1 });
 
   // Her owner için beauty center bilgisini de al
   const ownersWithCenters = await Promise.all(
@@ -87,14 +87,14 @@ export const getPendingOwners = asyncHandler(async (req, res) => {
       const center = await BeautyCenter.findOne({ ownerId: owner._id });
       return {
         ...owner.toObject(),
-        beautyCenter: center
+        beautyCenter: center,
       };
     })
   );
 
   res.json({
     success: true,
-    owners: ownersWithCenters
+    owners: ownersWithCenters,
   });
 });
 
@@ -131,43 +131,51 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+export const logoutAdmin = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.json({ message: "Çıkış yapıldı" });
+});
+
 // @desc    Get all owners (approved, pending, rejected)
 // @route   GET /api/admin/owners
 // @access  Private/Admin
 export const getAllOwners = asyncHandler(async (req, res) => {
   const { status, page = 1, limit = 10, search } = req.query;
-  
-  const filter = { role: 'owner' };
-  
+
+  const filter = { role: "owner" };
+
   // Status filtresi
-  if (status === 'pending') {
+  if (status === "pending") {
     filter.isApproved = false;
     filter.isBanned = false;
-  } else if (status === 'approved') {
+  } else if (status === "approved") {
     filter.isApproved = true;
     filter.isBanned = false;
-  } else if (status === 'banned') {
+  } else if (status === "banned") {
     filter.isBanned = true;
   }
-  
+
   // Search filtresi
   if (search) {
     filter.$or = [
-      { fullName: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } },
-      { phone: { $regex: search, $options: 'i' } }
+      { fullName: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+      { phone: { $regex: search, $options: "i" } },
     ];
   }
 
   const skip = (page - 1) * limit;
-  
+
   const [owners, totalCount] = await Promise.all([
     User.find(filter)
-      .select('-password')
+      .select("-password")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit)),
-    User.countDocuments(filter)
+    User.countDocuments(filter),
   ]);
 
   // Her owner için beauty center bilgisini de al
@@ -176,7 +184,7 @@ export const getAllOwners = asyncHandler(async (req, res) => {
       const center = await BeautyCenter.findOne({ ownerId: owner._id });
       return {
         ...owner.toObject(),
-        beautyCenter: center
+        beautyCenter: center,
       };
     })
   );
@@ -189,51 +197,59 @@ export const getAllOwners = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(totalCount / limit),
       totalCount,
       hasNext: page * limit < totalCount,
-      hasPrev: page > 1
-    }
+      hasPrev: page > 1,
+    },
   });
 });
 
 // @desc    Get owner details
 // @route   GET /api/admin/owners/:id
-// @access  Private/Admin  
+// @access  Private/Admin
 export const getOwnerDetails = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const owner = await User.findOne({ _id: id, role: 'owner' })
-    .select('-password');
+  const owner = await User.findOne({ _id: id, role: "owner" }).select(
+    "-password"
+  );
 
   if (!owner) {
     res.status(404);
-    throw new Error('Owner not found');
+    throw new Error("Owner not found");
   }
 
   // Beauty center bilgilerini al
-  const beautyCenter = await BeautyCenter.findOne({ ownerId: id })
-    .populate('ownerId', 'fullName email phone');
+  const beautyCenter = await BeautyCenter.findOne({ ownerId: id }).populate(
+    "ownerId",
+    "fullName email phone"
+  );
 
   // Owner'ın randevu istatistiklerini al
   let appointmentStats = null;
   if (beautyCenter) {
-    const [totalAppointments, pendingAppointments, thisMonthAppointments] = await Promise.all([
-      Appointment.countDocuments({ beautyCenterId: beautyCenter._id }),
-      Appointment.countDocuments({ 
-        beautyCenterId: beautyCenter._id, 
-        status: 'pending' 
-      }),
-      Appointment.countDocuments({
-        beautyCenterId: beautyCenter._id,
-        startDateTime: {
-          $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          $lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
-        }
-      })
-    ]);
+    const [totalAppointments, pendingAppointments, thisMonthAppointments] =
+      await Promise.all([
+        Appointment.countDocuments({ beautyCenterId: beautyCenter._id }),
+        Appointment.countDocuments({
+          beautyCenterId: beautyCenter._id,
+          status: "pending",
+        }),
+        Appointment.countDocuments({
+          beautyCenterId: beautyCenter._id,
+          startDateTime: {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            $lt: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() + 1,
+              1
+            ),
+          },
+        }),
+      ]);
 
     appointmentStats = {
       total: totalAppointments,
       pending: pendingAppointments,
-      thisMonth: thisMonthAppointments
+      thisMonth: thisMonthAppointments,
     };
   }
 
@@ -242,8 +258,8 @@ export const getOwnerDetails = asyncHandler(async (req, res) => {
     owner: {
       ...owner.toObject(),
       beautyCenter,
-      appointmentStats
-    }
+      appointmentStats,
+    },
   });
 });
 
@@ -254,16 +270,16 @@ export const approveOwner = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { notes } = req.body;
 
-  const owner = await User.findOne({ _id: id, role: 'owner' });
+  const owner = await User.findOne({ _id: id, role: "owner" });
 
   if (!owner) {
     res.status(404);
-    throw new Error('Owner not found');
+    throw new Error("Owner not found");
   }
 
   if (owner.isApproved) {
     res.status(400);
-    throw new Error('Owner is already approved');
+    throw new Error("Owner is already approved");
   }
 
   // Owner'ı onayla
@@ -282,19 +298,19 @@ export const approveOwner = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Owner approved successfully',
+    message: "Owner approved successfully",
     owner: {
       id: owner._id,
       fullName: owner.fullName,
       email: owner.email,
       isApproved: owner.isApproved,
-      approvedAt: new Date()
-    }
+      approvedAt: new Date(),
+    },
   });
 });
 
 // @desc    Reject owner
-// @route   PATCH /api/admin/owners/:id/reject  
+// @route   PATCH /api/admin/owners/:id/reject
 // @access  Private/Admin
 export const rejectOwner = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -302,19 +318,19 @@ export const rejectOwner = asyncHandler(async (req, res) => {
 
   if (!reason || reason.trim().length === 0) {
     res.status(400);
-    throw new Error('Rejection reason is required');
+    throw new Error("Rejection reason is required");
   }
 
-  const owner = await User.findOne({ _id: id, role: 'owner' });
+  const owner = await User.findOne({ _id: id, role: "owner" });
 
   if (!owner) {
     res.status(404);
-    throw new Error('Owner not found');
+    throw new Error("Owner not found");
   }
 
   if (owner.isApproved) {
     res.status(400);
-    throw new Error('Cannot reject an approved owner');
+    throw new Error("Cannot reject an approved owner");
   }
 
   // Owner'ı ban'le (rejected olarak işaretlemek için)
@@ -333,7 +349,7 @@ export const rejectOwner = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Owner rejected successfully',
+    message: "Owner rejected successfully",
     owner: {
       id: owner._id,
       fullName: owner.fullName,
@@ -341,8 +357,8 @@ export const rejectOwner = asyncHandler(async (req, res) => {
       isApproved: owner.isApproved,
       isBanned: owner.isBanned,
       rejectedAt: new Date(),
-      rejectionReason: reason
-    }
+      rejectionReason: reason,
+    },
   });
 });
 
@@ -351,41 +367,41 @@ export const rejectOwner = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 export const getAllUsers = asyncHandler(async (req, res) => {
   const { role, status, page = 1, limit = 10, search } = req.query;
-  
+
   const filter = {};
-  
+
   // Role filtresi
-  if (role && role !== 'all') {
+  if (role && role !== "all") {
     filter.role = role;
   } else {
-    filter.role = { $ne: 'admin' }; // Admin'leri gösterme
+    filter.role = { $ne: "admin" }; // Admin'leri gösterme
   }
-  
+
   // Status filtresi
-  if (status === 'banned') {
+  if (status === "banned") {
     filter.isBanned = true;
-  } else if (status === 'active') {
+  } else if (status === "active") {
     filter.isBanned = false;
   }
-  
+
   // Search filtresi
   if (search) {
     filter.$or = [
-      { fullName: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } },
-      { phone: { $regex: search, $options: 'i' } }
+      { fullName: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+      { phone: { $regex: search, $options: "i" } },
     ];
   }
 
   const skip = (page - 1) * limit;
-  
+
   const [users, totalCount] = await Promise.all([
     User.find(filter)
-      .select('-password')
+      .select("-password")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit)),
-    User.countDocuments(filter)
+    User.countDocuments(filter),
   ]);
 
   res.json({
@@ -396,8 +412,8 @@ export const getAllUsers = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(totalCount / limit),
       totalCount,
       hasNext: page * limit < totalCount,
-      hasPrev: page > 1
-    }
+      hasPrev: page > 1,
+    },
   });
 });
 
@@ -412,29 +428,28 @@ export const toggleUserBan = asyncHandler(async (req, res) => {
 
   if (!user) {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
-  if (user.role === 'admin') {
+  if (user.role === "admin") {
     res.status(403);
-    throw new Error('Cannot ban admin users');
+    throw new Error("Cannot ban admin users");
   }
 
-  if (action === 'ban') {
+  if (action === "ban") {
     if (!reason || reason.trim().length === 0) {
       res.status(400);
-      throw new Error('Ban reason is required');
+      throw new Error("Ban reason is required");
     }
-    
+
     user.isBanned = true;
-    
+
     // TODO: User'a email bildirimi gönder
     // await sendBanNotificationEmail(user.email, reason);
-    
-  } else if (action === 'unban') {
+  } else if (action === "unban") {
     user.isBanned = false;
-    
-    // TODO: User'a email bildirimi gönder  
+
+    // TODO: User'a email bildirimi gönder
     // await sendUnbanNotificationEmail(user.email);
   } else {
     res.status(400);
@@ -445,15 +460,15 @@ export const toggleUserBan = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: `User ${action === 'ban' ? 'banned' : 'unbanned'} successfully`,
+    message: `User ${action === "ban" ? "banned" : "unbanned"} successfully`,
     user: {
       id: user._id,
       fullName: user.fullName,
       email: user.email,
       role: user.role,
       isBanned: user.isBanned,
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    },
   });
 });
 
@@ -462,34 +477,34 @@ export const toggleUserBan = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 export const getAllBeautyCenters = asyncHandler(async (req, res) => {
   const { status, page = 1, limit = 10, search } = req.query;
-  
+
   const filter = {};
-  
+
   // Status filtresi
-  if (status === 'approved') {
+  if (status === "approved") {
     filter.isApproved = true;
-  } else if (status === 'pending') {
+  } else if (status === "pending") {
     filter.isApproved = false;
   }
-  
+
   // Search filtresi
   if (search) {
     filter.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { address: { $regex: search, $options: 'i' } },
-      { phone: { $regex: search, $options: 'i' } }
+      { name: { $regex: search, $options: "i" } },
+      { address: { $regex: search, $options: "i" } },
+      { phone: { $regex: search, $options: "i" } },
     ];
   }
 
   const skip = (page - 1) * limit;
-  
+
   const [centers, totalCount] = await Promise.all([
     BeautyCenter.find(filter)
-      .populate('ownerId', 'fullName email phone isApproved isBanned')
+      .populate("ownerId", "fullName email phone isApproved isBanned")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit)),
-    BeautyCenter.countDocuments(filter)
+    BeautyCenter.countDocuments(filter),
   ]);
 
   res.json({
@@ -500,8 +515,8 @@ export const getAllBeautyCenters = asyncHandler(async (req, res) => {
       totalPages: Math.ceil(totalCount / limit),
       totalCount,
       hasNext: page * limit < totalCount,
-      hasPrev: page > 1
-    }
+      hasPrev: page > 1,
+    },
   });
 });
 
@@ -512,28 +527,29 @@ export const toggleBeautyCenterStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { action, reason } = req.body; // action: 'suspend' or 'activate'
 
-  const center = await BeautyCenter.findById(id)
-    .populate('ownerId', 'fullName email');
+  const center = await BeautyCenter.findById(id).populate(
+    "ownerId",
+    "fullName email"
+  );
 
   if (!center) {
     res.status(404);
-    throw new Error('Beauty center not found');
+    throw new Error("Beauty center not found");
   }
 
-  if (action === 'suspend') {
+  if (action === "suspend") {
     if (!reason || reason.trim().length === 0) {
       res.status(400);
-      throw new Error('Suspension reason is required');
+      throw new Error("Suspension reason is required");
     }
-    
+
     center.isApproved = false;
-    
+
     // TODO: Owner'a email bildirimi gönder
     // await sendSuspensionEmail(center.ownerId.email, center.name, reason);
-    
-  } else if (action === 'activate') {
+  } else if (action === "activate") {
     center.isApproved = true;
-    
+
     // TODO: Owner'a email bildirimi gönder
     // await sendActivationEmail(center.ownerId.email, center.name);
   } else {
@@ -545,13 +561,15 @@ export const toggleBeautyCenterStatus = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: `Beauty center ${action === 'suspend' ? 'suspended' : 'activated'} successfully`,
+    message: `Beauty center ${
+      action === "suspend" ? "suspended" : "activated"
+    } successfully`,
     center: {
       id: center._id,
       name: center.name,
       isApproved: center.isApproved,
       owner: center.ownerId,
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    },
   });
 });

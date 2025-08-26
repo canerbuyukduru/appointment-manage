@@ -11,7 +11,8 @@ import {
   toggleUserBan,
   getAllBeautyCenters,
   toggleBeautyCenterStatus,
-  loginAdmin
+  loginAdmin,
+  logoutAdmin
 } from '../controllers/adminController.js';
 import { authenticate,authorizeAdmin } from '../middleware/authMiddleware.js';
 
@@ -23,6 +24,9 @@ router.post('/login', loginAdmin);
 // Tüm admin route'ları authenticate ve authorize gerektirir
 router.use(authenticate);
 router.use(authorizeAdmin); 
+
+// logout
+router.post('/logout',logoutAdmin);
 
 // Dashboard & Statistics
 router.get('/stats', getAdminStats);

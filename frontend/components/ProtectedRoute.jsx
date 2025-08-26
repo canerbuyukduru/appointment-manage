@@ -1,4 +1,4 @@
-// components/ProtectedRoute.jsx
+// components/ProtectedRoute.jsx - Optimized version
 'use client'
 import { useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
@@ -18,14 +18,15 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
       // 1. Giriş yapmamış mı?
       if (!isAuthenticated || !user) {
         console.log('Giriş yapmamış, login\'e yönlendiriliyor')
-        router.push('/login')
+        // Browser level redirect - kesin çözüm
+        window.location.href = '/login'
         return
       }
 
       // 2. Role kontrolü (eğer allowedRoles belirtilmişse)
       if (allowedRoles.length > 0 && (!user?.role || !allowedRoles.includes(user.role))) {
         console.log('Yetkisiz erişim, dashboard\'a yönlendiriliyor')
-        router.push('/dashboard')
+        window.location.href = '/dashboard'
         return
       }
 
@@ -36,6 +37,15 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
 
     return () => clearTimeout(timer)
   }, [isAuthenticated, user, router, allowedRoles])
+
+  // Auth state değişikliklerini dinle - anlık tepki
+  useEffect(() => {
+    // Eğer kullanıcı logout olmuşsa hemen yönlendir
+    if (isAuthenticated === false && user === null && !isLoading) {
+      console.log('Logout algılandı, yönlendiriliyor...')
+      window.location.href = '/login'
+    }
+  }, [isAuthenticated, user, isLoading])
 
   // Loading durumunda gösterilecek
   if (isLoading) {

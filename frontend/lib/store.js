@@ -4,6 +4,7 @@ import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // localStorage kullanır
 import { combineReducers } from '@reduxjs/toolkit'
 import { authApi } from './services/authApi'
+import { adminApi } from './services/adminApi' // 👈 Admin API'yi ekle
 import authSlice from './features/authSlice'
 import { beautyCenterApi } from './services/beautyCenterApi'
 import { departmentApi } from './services/departmentApi'
@@ -21,9 +22,10 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authSlice,
   [authApi.reducerPath]: authApi.reducer,
+  [adminApi.reducerPath]: adminApi.reducer,                    // 👈 Admin API reducer
   [beautyCenterApi.reducerPath]: beautyCenterApi.reducer,
   [departmentApi.reducerPath]: departmentApi.reducer,
-  [serviceApi.reducerPath]:serviceApi.reducer,
+  [serviceApi.reducerPath]: serviceApi.reducer,
   [appointmentApi.reducerPath]: appointmentApi.reducer
 })
 
@@ -44,7 +46,14 @@ export const store = configureStore({
           'persist/REGISTER',
         ],
       },
-    }).concat(authApi.middleware, beautyCenterApi.middleware, departmentApi.middleware, serviceApi.middleware, appointmentApi.middleware),
+    }).concat(
+      authApi.middleware, 
+      adminApi.middleware,           // 👈 Admin API middleware
+      beautyCenterApi.middleware, 
+      departmentApi.middleware, 
+      serviceApi.middleware, 
+      appointmentApi.middleware
+    ),
 })
 
 // Persistor oluştur (React'te kullanmak için)

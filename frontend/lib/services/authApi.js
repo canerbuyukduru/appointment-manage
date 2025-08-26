@@ -47,9 +47,9 @@ export const authApi = createApi({
       invalidatesTags: ['User'],
     }),
 
-    // Mevcut kullanıcı bilgisi
+    // Mevcut kullanıcı bilgisi - URL DÜZELTİLDİ!
     getCurrentUser: builder.query({
-      query: () => '/users/me',
+      query: () => '/users/profile', // ✅ /users/me yerine /users/profile
       providesTags: ['User'],
     }),
 
