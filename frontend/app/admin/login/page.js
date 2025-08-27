@@ -1,10 +1,10 @@
 // app/admin/login/page.jsx
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { useLoginAdminMutation } from '@/lib/services/adminApi'
-import { useGetCurrentUserQuery } from '@/lib/services/authApi'
+import { useSelector } from 'react-redux'  
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Shield, Lock, Mail } from 'lucide-react'
 
@@ -13,20 +13,21 @@ export default function AdminLoginPage() {
   const router = useRouter()
 
   const [loginAdmin, { isLoading }] = useLoginAdminMutation()
-  const { data: currentUser } = useGetCurrentUserQuery()
+  
+  // ✅ Sadece Redux state'den kontrol - API çağrısı yapmıyor
+  const { user, isAuthenticated } = useSelector((state) => state.auth)
+
+  // ✅ Eğer admin zaten giriş yapmışsa yönlendir (ama API çağrısı yapma)
+  if (isAuthenticated && user?.role === 'admin') {
+    router.push('/admin/dashboard')
+    return null
+  }
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm()
-
-  // Admin zaten giriş yapmışsa dashboard'a yönlendir
-  useEffect(() => {
-    if (currentUser?.role === 'admin') {
-      router.push('/admin/dashboard')
-    }
-  }, [currentUser, router])
 
   const onSubmit = async (data) => {
     try {

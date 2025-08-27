@@ -24,6 +24,7 @@ export const createAppointment = asyncHandler(async (req, res) => {
 
   // temel veriler
   const center = await BeautyCenter.findById(beautyCenterId);
+  console.log(center.isApproved)
   if (!center || !center.isApproved) {
     res.status(400);
     throw new Error("Merkez bulunamadı veya henüz onaylı değil.");

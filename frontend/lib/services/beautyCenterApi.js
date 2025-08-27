@@ -44,7 +44,7 @@ export const beautyCenterApi = createApi({
         if (params.page) searchParams.append('page', params.page)
         
         return {
-          url: `http://localhost:5000/api/users/beauty-centers?${searchParams.toString()}`
+          url: `http://localhost:5000/api/beauty-centers?${searchParams.toString()}`
           // credentials kaldırdık, çünkü public endpoint
         }
       },

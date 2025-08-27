@@ -7,6 +7,7 @@ import { logout } from "@/lib/features/authSlice";
 import toast from "react-hot-toast";
 import { User, Building, Shield, LogOut } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Link from "next/link";
 
 function DashboardContent() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -102,7 +103,7 @@ function DashboardContent() {
         </div>
 
         {/* User Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
           {/* Kullanıcı Bilgileri */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -147,18 +148,18 @@ function DashboardContent() {
                   {/* User için */}
                   {user?.role === "user" && (
                     <>
-                      <Link
-                        href="/appointments"
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                      <button
+                        onClick={() => router.push("/")}
+                        className="w-full text-left p-3 text-black cursor-pointer rounded-lg hover:bg-gray-50 transition-colors"
                       >
-                        📅 Randevularım
-                      </Link>
-                      <Link
-                        href="/centers"
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                        📅 Randevu Al
+                      </button>
+                      <button
+                        onClick={() => router.push("/user/appointments")}
+                        className="w-full text-left p-3 text-black cursor-pointer rounded-lg hover:bg-gray-50 transition-colors"
                       >
-                        🏢 Güzellik Merkezleri
-                      </Link>
+                        📋 Randevularım
+                      </button>
                     </>
                   )}
 
@@ -166,22 +167,28 @@ function DashboardContent() {
                   {user?.role === "owner" && (
                     <>
                       <Link
+                        href="/owner/dashboard"
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-50 transition-colors text-purple-700 font-medium"
+                      >
+                        📊 Owner Dashboard
+                      </Link>
+                      <Link
+                        href="/owner/beauty-center"
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                      >
+                        🏢 İşletme Yönetimi
+                      </Link>
+                      <Link
                         href="/owner/departments"
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
                       >
-                        📁 Departmanlar
+                        📂 Departmanlar
                       </Link>
                       <Link
                         href="/owner/appointments"
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
                       >
-                        📋 Randevu Yönetimi
-                      </Link>
-                      <Link
-                        href="/owner/center"
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
-                      >
-                        🏢 İşletme Ayarları
+                        📅 Randevu Yönetimi
                       </Link>
                     </>
                   )}
@@ -216,76 +223,6 @@ function DashboardContent() {
                     </>
                   )}
                 </div>
-              </div>
-              {user?.role === "user" && (
-                <>
-                  <button
-                    onClick={() => router.push("/")}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    📅 Randevu Al
-                  </button>
-                  <button
-                    onClick={() => router.push("/user/appointments")}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    📋 Randevularım
-                  </button>
-                </>
-              )}
-
-              {user?.role === "owner" && (
-                <>
-                  <button
-                    onClick={() => router.push("/owner/beauty-center")}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    🏢 İşletme Yönetimi
-                  </button>
-                  <button
-                    onClick={() => router.push("/owner/departments")}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    📂 Departmanlar
-                  </button>
-                  <button
-                    onClick={() => router.push("/owner/appointments")}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    📅 Randevu Yönetimi
-                  </button>
-                </>
-              )}
-
-              {user?.role === "admin" && (
-                <>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    👥 Kullanıcı Yönetimi
-                  </button>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    🏢 İşletme Onayları
-                  </button>
-                  <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    📊 Sistem Raporları
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* İstatistikler */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              İstatistikler
-            </h3>
-            <div className="space-y-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">0</div>
-                <div className="text-sm text-blue-600">Aktif Randevu</div>
-              </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">0</div>
-                <div className="text-sm text-green-600">Tamamlanan</div>
               </div>
             </div>
           </div>

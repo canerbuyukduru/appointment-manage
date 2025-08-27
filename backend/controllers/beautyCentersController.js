@@ -88,3 +88,24 @@ export const getCenterDepartments = asyncHandler(async (req, res) => {
 
   res.json(departments);
 });
+
+export const getAllBeautyCenters = asyncHandler(async (req, res) => {
+  const { search, location } = req.query
+
+  let query = {}
+
+  // 🔎 Arama filtresi (name veya description içinde arama)
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } }
+    ]
+  }
+// location için
+if (location) {
+  query.location = { $regex: location, $options: "i" }
+}
+
+  const beautyCenters = await BeautyCenter.find(query)
+  res.json(beautyCenters)
+})

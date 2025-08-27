@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "echo 'No build step needed for Node.js'",
+    "prestart": "echo 'Starting production server...'"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -18,5 +20,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

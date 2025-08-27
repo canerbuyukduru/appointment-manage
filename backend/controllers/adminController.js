@@ -268,7 +268,6 @@ export const getOwnerDetails = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 export const approveOwner = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { notes } = req.body;
 
   const owner = await User.findOne({ _id: id, role: "owner" });
 
@@ -278,8 +277,14 @@ export const approveOwner = asyncHandler(async (req, res) => {
   }
 
   if (owner.isApproved) {
-    res.status(400);
-    throw new Error("Owner is already approved");
+    const beautyCenter = await BeautyCenter.findOne({ ownerId: id });
+    if (beautyCenter) {
+      beautyCenter.isApproved = true;
+      await beautyCenter.save();
+    } else {
+      res.status(400);
+      throw new Error("Owner is already approved");
+    }
   }
 
   // Owner'ı onayla

@@ -22,10 +22,28 @@ const app = express();
 connectDB();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true, // Eğer cookie/token kullanıyorsan bu da gerekli olabilir
-}));
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Development'ta localhost'a izin ver
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      process.env.FRONTEND_URL // Production frontend URL
+    ];
+    
+    // Origin yoksa (Postman, mobile app vs.) veya allowed origins'te varsa izin ver
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Cookie'ler için gerekli
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with']
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

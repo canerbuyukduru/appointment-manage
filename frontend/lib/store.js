@@ -1,15 +1,19 @@
-// lib/store.js
+// lib/store.js - Final complete version
 import { configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // localStorage kullanır
 import { combineReducers } from '@reduxjs/toolkit'
+
+// API imports
 import { authApi } from './services/authApi'
-import { adminApi } from './services/adminApi' // 👈 Admin API'yi ekle
-import authSlice from './features/authSlice'
+import { adminApi } from './services/adminApi'           // ✅ AdminApi eklendi
 import { beautyCenterApi } from './services/beautyCenterApi'
 import { departmentApi } from './services/departmentApi'
 import { serviceApi } from './services/serviceApi'
 import { appointmentApi } from './services/appointmentApi'
+
+// Slice imports
+import authSlice from './features/authSlice'
 
 // Persist ayarları
 const persistConfig = {
@@ -22,7 +26,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authSlice,
   [authApi.reducerPath]: authApi.reducer,
-  [adminApi.reducerPath]: adminApi.reducer,                    // 👈 Admin API reducer
+  [adminApi.reducerPath]: adminApi.reducer,              // ✅ AdminApi reducer eklendi
   [beautyCenterApi.reducerPath]: beautyCenterApi.reducer,
   [departmentApi.reducerPath]: departmentApi.reducer,
   [serviceApi.reducerPath]: serviceApi.reducer,
@@ -48,7 +52,7 @@ export const store = configureStore({
       },
     }).concat(
       authApi.middleware, 
-      adminApi.middleware,           // 👈 Admin API middleware
+      adminApi.middleware,              // ✅ AdminApi middleware eklendi
       beautyCenterApi.middleware, 
       departmentApi.middleware, 
       serviceApi.middleware, 

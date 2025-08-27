@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { useLoginUserMutation, useLoginOwnerMutation } from '@/lib/services/authApi'
 import { setCredentials } from '@/lib/features/authSlice'
 import { Eye, EyeOff, User, Building } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -72,42 +73,43 @@ export default function LoginPage() {
             onClick={() => setUserType('user')}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
               userType === 'user'
-                ? 'bg-white shadow-sm text-pink-600'
-                : 'text-gray-600'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
             }`}
           >
             <User size={18} />
-            Kullanıcı
+            <span className="font-medium">Kullanıcı</span>
           </button>
           <button
             type="button"
             onClick={() => setUserType('owner')}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-all ${
               userType === 'owner'
-                ? 'bg-white shadow-sm text-pink-600'
-                : 'text-gray-600'
+                ? 'bg-white text-purple-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
             }`}
           >
             <Building size={18} />
-            İşletme
+            <span className="font-medium">İşletme</span>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              E-posta
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              E-posta Adresi
             </label>
             <input
               {...register('email', {
-                required: 'E-posta zorunludur',
+                required: 'E-posta adresi zorunludur',
                 pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Geçersiz e-posta formatı'
-                }
+                  value: /^\S+@\S+$/i,
+                  message: 'Geçerli bir e-posta adresi giriniz',
+                },
               })}
               type="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
               placeholder="ornek@email.com"
             />
             {errors.email && (
@@ -115,27 +117,24 @@ export default function LoginPage() {
             )}
           </div>
 
+          {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Şifre
             </label>
             <div className="relative">
               <input
                 {...register('password', {
                   required: 'Şifre zorunludur',
-                  minLength: {
-                    value: 6,
-                    message: 'Şifre en az 6 karakter olmalıdır'
-                  }
                 })}
                 type={showPassword ? 'text' : 'password'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all pr-12"
+                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 placeholder="••••••••"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -145,25 +144,62 @@ export default function LoginPage() {
             )}
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+            {isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Giriş yapılıyor...
+              </div>
+            ) : (
+              'Giriş Yap'
+            )}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Hesabınız yok mu?{' '}
-            <button
-              onClick={() => router.push('/register')}
-              className="text-pink-600 hover:text-pink-700 font-semibold"
-            >
-              Kayıt olun
-            </button>
-          </p>
+        {/* Register Links */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="text-center space-y-3">
+            <p className="text-gray-600 font-medium">Hesabınız yok mu?</p>
+            
+            <div className="grid grid-cols-1 gap-3">
+              {/* User Register */}
+              <Link
+                href="/register/user"
+                className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+              >
+                <User size={18} />
+                Kullanıcı Kayıt (Randevu Al)
+              </Link>
+              
+              {/* Owner Register */}
+              <Link
+                href="/register/owner"
+                className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium"
+              >
+                <Building size={18} />
+                İşletme Sahibi Kayıt
+              </Link>
+            </div>
+            
+            <p className="text-xs text-gray-500 mt-4">
+              İşletme sahibi kaydı admin onayı gerektirir
+            </p>
+          </div>
+        </div>
+
+        {/* Admin Link */}
+        <div className="text-center mt-6">
+          <Link 
+            href="/admin/login"
+            className="text-gray-400 hover:text-gray-600 text-sm transition-colors"
+          >
+            Admin Girişi
+          </Link>
         </div>
       </div>
     </div>
