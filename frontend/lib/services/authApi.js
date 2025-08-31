@@ -47,11 +47,31 @@ export const authApi = createApi({
       invalidatesTags: ['User'],
     }),
 
-    // Mevcut kullanıcı bilgisi - URL DÜZELTİLDİ!
+    // Mevcut kullanıcı bilgisi
     getCurrentUser: builder.query({
-      query: () => '/users/profile', // ✅ /users/me yerine /users/profile
+      query: () => '/users/me',
       providesTags: ['User'],
     }),
+
+    // 🆕 Kullanıcı profil güncelleme
+    updateUserProfile: builder.mutation({
+      query: (profileData) => ({
+        url: '/users/profile',
+        method: 'PUT',
+        body: profileData,
+      }),
+      invalidatesTags: ['User'], // Cache'i temizle ki yeni data gelsin
+    }),
+     // 🆕 Owner profil güncelleme
+    updateOwnerProfile: builder.mutation({
+      query: (profileData) => ({
+        url: '/owners/profile',
+        method: 'PUT',
+        body: profileData,
+      }),
+      invalidatesTags: ['User'], // Cache'i temizle ki yeni data gelsin
+    }),
+
 
     // Çıkış
     logout: builder.mutation({
@@ -70,5 +90,7 @@ export const {
   useRegisterOwnerMutation,
   useLoginOwnerMutation,
   useGetCurrentUserQuery,
+  useUpdateUserProfileMutation, // 🆕 Export edildi
+  useUpdateOwnerProfileMutation, // 🆕 Export edildi
   useLogoutMutation,
 } = authApi

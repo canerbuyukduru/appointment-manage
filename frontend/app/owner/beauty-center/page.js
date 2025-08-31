@@ -208,7 +208,7 @@ function BeautyCenterManager() {
                     minLength: { value: 2, message: 'En az 2 karakter olmalıdır' }
                   })}
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                   placeholder="Bella Beauty Salon"
                 />
                 {errors.name && (
@@ -232,7 +232,7 @@ function BeautyCenterManager() {
                       }
                     })}
                     type="text"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                     placeholder="+90 555 123 4567"
                   />
                 </div>
@@ -256,7 +256,7 @@ function BeautyCenterManager() {
                       }
                     })}
                     type="email"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                     placeholder="info@bellasalon.com"
                   />
                 </div>
@@ -275,7 +275,7 @@ function BeautyCenterManager() {
                   <input
                     {...register('location')}
                     type="text"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                     placeholder="Ankara, Türkiye"
                   />
                 </div>
@@ -293,7 +293,7 @@ function BeautyCenterManager() {
                   minLength: { value: 10, message: 'En az 10 karakter olmalıdır' }
                 })}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 placeholder="Kızılay Mah. Atatürk Bulvarı No:123 Çankaya/ANKARA"
               />
               {errors.address && (
@@ -309,10 +309,10 @@ function BeautyCenterManager() {
               <textarea
                 {...register('description')}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 placeholder="Profesyonel güzellik hizmetleri sunan modern salonumuzda saç, cilt ve makyaj hizmetleri veriyoruz..."
               />
-              <p className="text-gray-500 text-sm mt-2">Müşteriler işletmenizi ararken bu açıklamayı görecek.</p>
+              <p className="text-black text-sm mt-2">Müşteriler işletmenizi ararken bu açıklamayı görecek.</p>
             </div>
           </div>
 
@@ -344,13 +344,13 @@ function BeautyCenterManager() {
                       <input
                         type="time"
                         {...register(`workingHours.${day}.open`)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                        className="px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
                       />
                       <span className="text-gray-500">-</span>
                       <input
                         type="time"
                         {...register(`workingHours.${day}.close`)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                        className="px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
                       />
                     </div>
                   )}

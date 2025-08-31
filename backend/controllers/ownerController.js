@@ -30,7 +30,9 @@ export const registerOwner = async (req, res) => {
 
     await owner.save();
 
-    res.status(201).json({ message: "Owner kaydı başarıyla oluşturuldu.", owner });
+    res
+      .status(201)
+      .json({ message: "Owner kaydı başarıyla oluşturuldu.", owner });
   } catch (error) {
     res.status(500).json({ message: "Sunucu hatası", error: error.message });
   }
@@ -84,7 +86,118 @@ export const logoutOwner = async (req, res) => {
   }
 };
 
+// 📌 Owner Profile Update
+export const updateOwnerProfile = asyncHandler(async (req, res) => {
+  try {
+    // 1. Giriş yapmış owner'ı bul (middleware'dan gelir)
+    const owner = req.user;
+    
+    if (!owner) {
+      res.status(404);
+      throw new Error("Owner bulunamadı");
+    }
 
+    // 2. Sadece owner role'ü olan kullanıcılar güncelleyebilir
+    if (owner.role !== "owner") {
+      res.status(403);
+      throw new Error("Bu işlem sadece owner'lar tarafından yapılabilir");
+    }
+
+    // 3. Güncellenecek alanları al
+    const { fullName, phone, password, oldPassword } = req.body;
+
+    // 4. Şifre değişikliği varsa, eski şifreyi kontrol et
+    if (password) {
+      if (!oldPassword) {
+        res.status(400);
+        throw new Error("Şifre değiştirmek için mevcut şifrenizi giriniz");
+      }
+
+      // Eski şifre kontrolü
+      const isOldPasswordCorrect = await bcrypt.compare(oldPassword, owner.password);
+      if (!isOldPasswordCorrect) {
+        res.status(400);
+        throw new Error("Mevcut şifreniz yanlış");
+      }
+
+      // Yeni şifreyi hashle
+      const salt = await bcrypt.genSalt(10);
+      owner.password = await bcrypt.hash(password, salt);
+    }
+
+    // 5. Diğer alanları güncelle (sadece gelen alanları)
+    if (fullName !== undefined) owner.fullName = fullName;
+    if (phone !== undefined) owner.phone = phone;
+
+    // 6. Veritabanına kaydet
+    await owner.save();
+
+    // 7. Güncellenmiş bilgileri döndür (şifre hariç)
+    res.json({
+      success: true,
+      message: "Profil başarıyla güncellendi",
+      owner: {
+        _id: owner._id,
+        fullName: owner.fullName,
+        email: owner.email, // Email değiştirilemez
+        phone: owner.phone,
+        role: owner.role,
+        isApproved: owner.isApproved,
+        updatedAt: new Date()
+      }
+    });
+
+  } catch (error) {
+    console.error("Owner profile update error:", error);
+    res.status(500).json({ 
+      message: "Profil güncellenirken bir hata oluştu", 
+      error: error.message 
+    });
+  }
+});
+
+// 📌 Owner'ın mevcut profilini getiren fonksiyon
+export const getOwnerProfile = asyncHandler(async (req, res) => {
+  try {
+    // Giriş yapmış owner'ı bul
+    const owner = req.user;
+    
+    if (!owner) {
+      res.status(404);
+      throw new Error("Owner bulunamadı");
+    }
+
+    if (owner.role !== "owner") {
+      res.status(403);
+      throw new Error("Bu işlem sadece owner'lar tarafından yapılabilir");
+    }
+
+    // Owner'ın beauty center bilgisini de getir
+    const beautyCenter = await BeautyCenter.findOne({ ownerId: owner._id });
+
+    res.json({
+      success: true,
+      owner: {
+        _id: owner._id,
+        fullName: owner.fullName,
+        email: owner.email,
+        phone: owner.phone,
+        role: owner.role,
+        isApproved: owner.isApproved,
+        isBanned: owner.isBanned,
+        createdAt: owner.createdAt,
+        beautyCenter: beautyCenter || null
+      }
+    });
+
+  } catch (error) {
+    console.error("Get owner profile error:", error);
+    res.status(500).json({ 
+      message: "Profil bilgileri alınırken bir hata oluştu", 
+      error: error.message 
+    });
+  }
+});
 
 export const getOwnerAppointments = asyncHandler(async (req, res) => {
   const { status, date } = req.query; // Query parametrelerini al
@@ -100,7 +213,7 @@ export const getOwnerAppointments = asyncHandler(async (req, res) => {
   const filter = { beautyCenterId: center._id };
 
   // Status filtresi
-  if (status && status !== 'all') {
+  if (status && status !== "all") {
     filter.status = status;
   }
 
@@ -112,7 +225,7 @@ export const getOwnerAppointments = asyncHandler(async (req, res) => {
 
     filter.startDateTime = {
       $gte: selectedDate,
-      $lt: nextDay
+      $lt: nextDay,
     };
   }
 
@@ -127,20 +240,29 @@ export const getOwnerAppointments = asyncHandler(async (req, res) => {
   res.json({ appointments });
 });
 
-
 const getOwnerCenter = async (ownerId) => {
   return await BeautyCenter.findOne({ ownerId });
 };
 
-// kullanılmıyor 
+// kullanılmıyor
 export const ownerApproveAppointment = asyncHandler(async (req, res) => {
   const center = await getOwnerCenter(req.user._id);
-  if (!center) { res.status(404); throw new Error("Beauty center not found"); }
+  if (!center) {
+    res.status(404);
+    throw new Error("Beauty center not found");
+  }
 
-  const appt = await Appointment.findOne({ _id: req.params.id, beautyCenterId: center._id });
-  if (!appt) { res.status(404); throw new Error("Appointment not found"); }
+  const appt = await Appointment.findOne({
+    _id: req.params.id,
+    beautyCenterId: center._id,
+  });
+  if (!appt) {
+    res.status(404);
+    throw new Error("Appointment not found");
+  }
   if (appt.status !== "pending") {
-    res.status(400); throw new Error("Only pending appointments can be approved");
+    res.status(400);
+    throw new Error("Only pending appointments can be approved");
   }
 
   appt.status = "approved";
@@ -150,12 +272,22 @@ export const ownerApproveAppointment = asyncHandler(async (req, res) => {
 });
 export const ownerRejectAppointment = asyncHandler(async (req, res) => {
   const center = await getOwnerCenter(req.user._id);
-  if (!center) { res.status(404); throw new Error("Beauty center not found"); }
+  if (!center) {
+    res.status(404);
+    throw new Error("Beauty center not found");
+  }
 
-  const appt = await Appointment.findOne({ _id: req.params.id, beautyCenterId: center._id });
-  if (!appt) { res.status(404); throw new Error("Appointment not found"); }
-  if (!["pending","approved"].includes(appt.status)) {
-    res.status(400); throw new Error("This appointment cannot be rejected");
+  const appt = await Appointment.findOne({
+    _id: req.params.id,
+    beautyCenterId: center._id,
+  });
+  if (!appt) {
+    res.status(404);
+    throw new Error("Appointment not found");
+  }
+  if (!["pending", "approved"].includes(appt.status)) {
+    res.status(400);
+    throw new Error("This appointment cannot be rejected");
   }
 
   appt.status = "rejected";
@@ -163,7 +295,6 @@ export const ownerRejectAppointment = asyncHandler(async (req, res) => {
 
   res.json({ message: "Appointment rejected", appointment: appt });
 });
-
 
 export const ownerMarkAttendance = asyncHandler(async (req, res) => {
   const { attended } = req.body;
@@ -193,7 +324,9 @@ export const ownerMarkAttendance = asyncHandler(async (req, res) => {
   // Yalnızca onaylı (veya daha önce işaretlenmiş) randevular işaretlenebilir
   if (!["approved", "completed", "no-show"].includes(appt.status)) {
     res.status(400);
-    throw new Error("Sadece onaylı veya daha önce işaretlenmiş randevular güncellenebilir.");
+    throw new Error(
+      "Sadece onaylı veya daha önce işaretlenmiş randevular güncellenebilir."
+    );
   }
 
   // Gelecek zaman kısıtı (en azından randevu başlamış olmalı)
@@ -210,17 +343,18 @@ export const ownerMarkAttendance = asyncHandler(async (req, res) => {
   await appt.save();
 
   res.json({
-    message: attended ? "Randevu tamamlandı olarak işaretlendi." : "Randevu no-show olarak işaretlendi.",
+    message: attended
+      ? "Randevu tamamlandı olarak işaretlendi."
+      : "Randevu no-show olarak işaretlendi.",
     appointment: appt,
   });
 });
 // kullanılmıyor
 
-
 export const updateAppointmentStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
-  
+
   // Owner'ın bu randevuyu güncelleyebilir mi kontrol et
   const center = await BeautyCenter.findOne({ ownerId: req.user._id });
   if (!center) {
@@ -228,9 +362,9 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
     throw new Error("Beauty center not found");
   }
 
-  const appointment = await Appointment.findOne({ 
-    _id: id, 
-    beautyCenterId: center._id 
+  const appointment = await Appointment.findOne({
+    _id: id,
+    beautyCenterId: center._id,
   });
 
   if (!appointment) {
@@ -245,9 +379,9 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
 
   await appointment.save();
 
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: "Appointment status updated",
-    appointment 
+    appointment,
   });
 });
