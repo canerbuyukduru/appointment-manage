@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './db/db.js';
 import cookieParser from 'cookie-parser';
 
+import cronService from './services/cronService.js';
 
 // Routes
 import userRoutes from './routes/userRoutes.js';
@@ -16,6 +17,7 @@ import availabilityRoutes from './routes/availabilityRoutes.js';
 
 
 import cors from 'cors';
+import { authenticate, authorizeAdmin } from './middleware/authMiddleware.js';
 dotenv.config();
 
 const app = express();
@@ -49,6 +51,45 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser());
+
+// Express app oluşturduktan sonra ve routes'tan önce ekle:
+
+// 🔔 Cron Service'i başlat
+console.log('📅 Initializing cron services...');
+// cronService otomatik olarak constructor'da init() çağırır
+
+// Graceful shutdown için process listener'ları ekle
+process.on('SIGINT', () => {
+  console.log('\n🛑 Received SIGINT. Shutting down gracefully...');
+  cronService.stopAllJobs();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Received SIGTERM. Shutting down gracefully...');
+  cronService.stopAllJobs();
+  process.exit(0);
+});
+
+// Manuel hatırlatma endpoint'i (opsiyonel - admin/owner için)
+app.post('/api/admin/send-reminder/:appointmentId', authenticate, authorizeAdmin, async (req, res) => {
+  try {
+    const result = await cronService.sendManualReminder(req.params.appointmentId);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Cron job durumlarını görme endpoint'i (opsiyonel - admin için)
+app.get('/api/admin/cron-status', authenticate, authorizeAdmin, (req, res) => {
+  try {
+    const jobs = cronService.getActiveJobs();
+    res.json({ jobs });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // User routes
 app.use("/api/users", userRoutes);

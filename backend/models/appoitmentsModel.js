@@ -52,6 +52,27 @@ const appointmentSchema = new mongoose.Schema(
       duration: Number, // dk
       price: Number,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Owner'ı referans eder
+      default: null, // Müşteri kendi oluşturduysa null kalır
+    },
+
+    notes: {
+      type: String,
+      default: "",
+    },
+    reminderSent: {
+      type: Boolean,
+      default: false, // Hatırlatma email'i gönderildi mi?
+    },
+
+    emailsSent: {
+      created: { type: Boolean, default: false },
+      approved: { type: Boolean, default: false },
+      rejected: { type: Boolean, default: false },
+      reminder: { type: Boolean, default: false },
+    },
   },
   { timestamps: true }
 );

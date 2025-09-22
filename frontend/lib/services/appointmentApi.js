@@ -71,6 +71,14 @@ export const appointmentApi = createApi({
       },
       providesTags: ["Appointment"],
     }),
+    createAppointmentForCustomer: builder.mutation({
+      query: (appointmentData) => ({
+        url: `http://localhost:5000/api/owners/appointments/create-for-customer`,
+        method: "POST",
+        body: appointmentData,
+      }),
+      invalidatesTags: ["Appointment", "OwnerAppointments"],
+    }),
   }),
 });
 
@@ -82,6 +90,7 @@ export const {
   useGetAvailableSlotsQuery,
   useGetOwnerAppointmentsQuery,
   useUpdateAppointmentStatusMutation,
+  useCreateAppointmentForCustomerMutation,
 } = appointmentApi;
 
 // Default export da ekle

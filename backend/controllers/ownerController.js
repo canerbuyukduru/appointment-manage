@@ -4,6 +4,9 @@ import generateToken from "../utils/createToken.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Appointment from "../models/appoitmentsModel.js";
 import BeautyCenter from "../models/beautyCentersModel.js";
+import Department from "../models/departmentModel.js";
+import Service from "../models/servicesModel.js";
+import emailService from "../services/emailService.js";
 
 // 📌 Owner Register
 export const registerOwner = async (req, res) => {
@@ -91,7 +94,7 @@ export const updateOwnerProfile = asyncHandler(async (req, res) => {
   try {
     // 1. Giriş yapmış owner'ı bul (middleware'dan gelir)
     const owner = req.user;
-    
+
     if (!owner) {
       res.status(404);
       throw new Error("Owner bulunamadı");
@@ -114,7 +117,10 @@ export const updateOwnerProfile = asyncHandler(async (req, res) => {
       }
 
       // Eski şifre kontrolü
-      const isOldPasswordCorrect = await bcrypt.compare(oldPassword, owner.password);
+      const isOldPasswordCorrect = await bcrypt.compare(
+        oldPassword,
+        owner.password
+      );
       if (!isOldPasswordCorrect) {
         res.status(400);
         throw new Error("Mevcut şifreniz yanlış");
@@ -143,15 +149,14 @@ export const updateOwnerProfile = asyncHandler(async (req, res) => {
         phone: owner.phone,
         role: owner.role,
         isApproved: owner.isApproved,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
-
   } catch (error) {
     console.error("Owner profile update error:", error);
-    res.status(500).json({ 
-      message: "Profil güncellenirken bir hata oluştu", 
-      error: error.message 
+    res.status(500).json({
+      message: "Profil güncellenirken bir hata oluştu",
+      error: error.message,
     });
   }
 });
@@ -161,7 +166,7 @@ export const getOwnerProfile = asyncHandler(async (req, res) => {
   try {
     // Giriş yapmış owner'ı bul
     const owner = req.user;
-    
+
     if (!owner) {
       res.status(404);
       throw new Error("Owner bulunamadı");
@@ -186,15 +191,14 @@ export const getOwnerProfile = asyncHandler(async (req, res) => {
         isApproved: owner.isApproved,
         isBanned: owner.isBanned,
         createdAt: owner.createdAt,
-        beautyCenter: beautyCenter || null
-      }
+        beautyCenter: beautyCenter || null,
+      },
     });
-
   } catch (error) {
     console.error("Get owner profile error:", error);
-    res.status(500).json({ 
-      message: "Profil bilgileri alınırken bir hata oluştu", 
-      error: error.message 
+    res.status(500).json({
+      message: "Profil bilgileri alınırken bir hata oluştu",
+      error: error.message,
     });
   }
 });
@@ -245,7 +249,10 @@ const getOwnerCenter = async (ownerId) => {
 };
 
 // kullanılmıyor
+// Randevu onaylama fonksiyonunu güncelle
 export const ownerApproveAppointment = asyncHandler(async (req, res) => {
+  const { notes } = req.body;
+  
   const center = await getOwnerCenter(req.user._id);
   if (!center) {
     res.status(404);
@@ -255,7 +262,10 @@ export const ownerApproveAppointment = asyncHandler(async (req, res) => {
   const appt = await Appointment.findOne({
     _id: req.params.id,
     beautyCenterId: center._id,
-  });
+  })
+  .populate("userId", "fullName email phone")
+  .populate("serviceId", "name duration price");
+
   if (!appt) {
     res.status(404);
     throw new Error("Appointment not found");
@@ -266,11 +276,36 @@ export const ownerApproveAppointment = asyncHandler(async (req, res) => {
   }
 
   appt.status = "approved";
+  if (notes) appt.notes = notes;
   await appt.save();
 
-  res.json({ message: "Appointment approved", appointment: appt });
+  // 📧 EMAIL GÖNDERİMİ
+  try {
+    if (appt.userId.email) {
+      await emailService.sendAppointmentApproved(appt.userId.email, {
+        customerName: appt.userId.fullName,
+        centerName: center.name,
+        serviceName: appt.serviceSnapshot?.name || appt.serviceId?.name,
+        startDateTime: appt.startDateTime,
+        centerPhone: center.phone,
+        centerAddress: center.address
+      });
+    }
+    console.log('📧 Appointment approval email sent');
+  } catch (emailError) {
+    console.error('📧 Email sending failed:', emailError);
+  }
+
+  res.json({ 
+    message: "Appointment approved", 
+    appointment: appt,
+    emailSent: appt.userId.email ? true : false
+  });
 });
+// Randevu reddetme fonksiyonunu güncelle
 export const ownerRejectAppointment = asyncHandler(async (req, res) => {
+  const { notes } = req.body;
+  
   const center = await getOwnerCenter(req.user._id);
   if (!center) {
     res.status(404);
@@ -280,7 +315,10 @@ export const ownerRejectAppointment = asyncHandler(async (req, res) => {
   const appt = await Appointment.findOne({
     _id: req.params.id,
     beautyCenterId: center._id,
-  });
+  })
+  .populate("userId", "fullName email phone")
+  .populate("serviceId", "name duration price");
+
   if (!appt) {
     res.status(404);
     throw new Error("Appointment not found");
@@ -291,9 +329,30 @@ export const ownerRejectAppointment = asyncHandler(async (req, res) => {
   }
 
   appt.status = "rejected";
+  if (notes) appt.notes = notes;
   await appt.save();
 
-  res.json({ message: "Appointment rejected", appointment: appt });
+  // 📧 EMAIL GÖNDERİMİ
+  try {
+    if (appt.userId.email) {
+      await emailService.sendAppointmentRejected(appt.userId.email, {
+        customerName: appt.userId.fullName,
+        centerName: center.name,
+        serviceName: appt.serviceSnapshot?.name || appt.serviceId?.name,
+        startDateTime: appt.startDateTime,
+        rejectionReason: notes
+      });
+    }
+    console.log('📧 Appointment rejection email sent');
+  } catch (emailError) {
+    console.error('📧 Email sending failed:', emailError);
+  }
+
+  res.json({ 
+    message: "Appointment rejected", 
+    appointment: appt,
+    emailSent: appt.userId.email ? true : false
+  });
 });
 
 export const ownerMarkAttendance = asyncHandler(async (req, res) => {
@@ -383,5 +442,180 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
     success: true,
     message: "Appointment status updated",
     appointment,
+  });
+});
+
+// Mevcut createAppointmentForCustomer fonksiyonunu güncelle:
+export const createAppointmentForCustomer = asyncHandler(async (req, res) => {
+  const { 
+    customerEmail, 
+    customerPhone, 
+    customerFullName, 
+    departmentId, 
+    serviceId, 
+    startDateTime,
+    notes
+  } = req.body;
+
+  // Validasyon
+  if (!departmentId || !serviceId || !startDateTime) {
+    res.status(400);
+    throw new Error("departmentId, serviceId ve startDateTime zorunludur.");
+  }
+
+  if (!customerEmail && !customerPhone) {
+    res.status(400);
+    throw new Error("Müşteri email veya telefon bilgisi zorunludur.");
+  }
+
+  // Owner'ın merkezini bul
+  const center = await getOwnerCenter(req.user._id);
+  if (!center) {
+    res.status(404);
+    throw new Error("Beauty center bulunamadı.");
+  }
+
+  // Departman ve hizmet kontrolü
+  const dept = await Department.findById(departmentId);
+  if (!dept) {
+    res.status(404);
+    throw new Error("Departman bulunamadı.");
+  }
+
+  const service = await Service.findById(serviceId);
+  if (!service) {
+    res.status(404);
+    throw new Error("Hizmet bulunamadı.");
+  }
+
+  // Müşteriyi bul veya oluştur
+  let customer = null;
+  let customerCreated = false;
+  let tempPassword = null;
+  
+  if (customerEmail) {
+    customer = await User.findOne({ email: customerEmail });
+  } else if (customerPhone) {
+    customer = await User.findOne({ phone: customerPhone });
+  }
+
+  // Müşteri yoksa yeni hesap oluştur
+  if (!customer) {
+    tempPassword = Math.random().toString(36).slice(-8) + '!';
+    customer = await User.create({
+      fullName: customerFullName || "Müşteri",
+      email: customerEmail || `customer_${Date.now()}@temp.com`,
+      phone: customerPhone || "",
+      password: tempPassword,
+      role: "user"
+    });
+    
+    customerCreated = true;
+  }
+
+  // Başlama/bitiş saatleri
+  const start = new Date(startDateTime);
+  const end = new Date(start.getTime() + service.duration * 60000);
+  const beautyCenterId = center._id;
+
+  // Çalışma saatleri kontrolü
+  const weekday = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][start.getUTCDay()];
+  const wh = center.workingHours?.[weekday];
+  const dateStr = start.toISOString().slice(0,10);
+  const isHoliday = (center.customHolidays || []).some(h => h.date === dateStr);
+
+  if (!wh || wh.isClosed || isHoliday) {
+    res.status(400);
+    throw new Error("Seçilen gün merkez kapalı.");
+  }
+
+  const [openH, openM] = (wh.open || "09:00").split(":").map(Number);
+  const [closeH, closeM] = (wh.close || "18:00").split(":").map(Number);
+
+  const openDT = new Date(start); openDT.setUTCHours(openH, openM, 0, 0);
+  const closeDT = new Date(start); closeDT.setUTCHours(closeH, closeM, 0, 0);
+
+  if (start < openDT || end > closeDT) {
+    res.status(400);
+    throw new Error("Seçilen saat çalışma saatleri dışında.");
+  }
+
+  // Kapasite kontrolü
+  const roomCount = dept.roomCount || 1;
+  const overlapping = await Appointment.countDocuments({
+    beautyCenterId, 
+    departmentId,
+    status: { $in: ["pending","approved"] },
+    $expr: { 
+      $and: [
+        { $lt: ["$startDateTime", end] }, 
+        { $gt: ["$endDateTime", start] }
+      ] 
+    }
+  });
+
+  if (overlapping >= roomCount) {
+    res.status(400);
+    throw new Error("Bu saat dolu.");
+  }
+
+  // Randevuyu oluştur (Owner tarafından oluşturulan randevular direkt onaylı)
+  const appointment = await Appointment.create({
+    userId: customer._id,
+    beautyCenterId,
+    departmentId,
+    serviceId,
+    startDateTime: start,
+    endDateTime: end,
+    status: "approved", // Owner oluşturduğu için direkt onaylı
+    notes: notes || "",
+    createdBy: req.user._id, // Hangi owner oluşturduğunu track etmek için
+    serviceSnapshot: {
+      name: service.name,
+      duration: service.duration,
+      price: service.price
+    }
+  });
+
+  // Populate edilmiş randevu döndür
+  const populatedAppointment = await Appointment.findById(appointment._id)
+    .populate("userId", "fullName email phone")
+    .populate("departmentId", "name")
+    .populate("serviceId", "name duration price");
+
+  // 📧 EMAIL GÖNDERİMİ
+  try {
+    // 1. Yeni müşteri oluşturulduysa hesap bilgileri maili
+    if (customerCreated && customerEmail && tempPassword) {
+      await emailService.sendNewCustomerAccount(customerEmail, {
+        customerName: customer.fullName,
+        tempPassword: tempPassword,
+        centerName: center.name
+      });
+    }
+
+    // 2. Randevu onaylandı maili (Owner oluşturduğu için direkt onaylı)
+    if (customerEmail) {
+      await emailService.sendAppointmentApproved(customerEmail, {
+        customerName: customer.fullName,
+        centerName: center.name,
+        serviceName: service.name,
+        startDateTime: start,
+        centerPhone: center.phone,
+        centerAddress: center.address
+      });
+    }
+
+    console.log('📧 Email notifications sent successfully');
+  } catch (emailError) {
+    console.error('📧 Email sending failed:', emailError);
+    // Email hatası uygulamayı durdurmasın, sadece log'la
+  }
+
+  res.status(201).json({
+    message: "Müşteri için randevu başarıyla oluşturuldu.",
+    appointment: populatedAppointment,
+    customerCreated: customerCreated,
+    emailSent: customerEmail ? true : false
   });
 });
