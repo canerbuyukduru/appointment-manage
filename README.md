@@ -1,257 +1,246 @@
-Student Management System
-Modern, full-stack öğrenci yönetim sistemi. Admin paneli ve öğrenci portalı ile kapsamlı eğitim yönetimi çözümü.
-🚀 Özellikler
-Admin Paneli
+# Beauty Center - Randevu Yönetim Sistemi
 
-Öğrenci Yönetimi: Öğrenci ekleme, düzenleme, silme ve görüntüleme
-Ders Yönetimi: Ders tanımlama, kapasité yönetimi ve ders durumu kontrolü
-Kayıt İşlemleri: Öğrenci-ders eşleştirmesi ve kayıt yönetimi
-Dashboard: Anlık istatistikler ve özet bilgiler
-Raporlama: Detaylı raporlar ve analitik veriler
+Güzellik merkezi randevu yönetim sistemi - Müşteriler güzellik merkezlerini keşfedip kolayca randevu alabilir, işletme sahipleri randevularını yönetebilir.
 
-Öğrenci Portalı
+## 🚀 Özellikler
 
-Profil Yönetimi: Kişisel bilgileri güncelleme
-Ders Kayıt: Mevcut derslere kayıt olma
-Derslerim: Kayıtlı olunan dersleri görüntüleme
-Ders İptali: Kayıtlı derslerden ayrılma
+### 👤 Kullanıcılar (Müşteriler)
+- Hesap oluşturma ve giriş yapma
+- Güzellik merkezlerini arama ve filtreleme
+- Hizmetleri görüntüleme ve randevu alma
+- Randevu geçmişini görüntüleme
+- Randevu iptal etme
 
-Sistem Özellikleri
+### 🏢 İşletme Sahipleri (Owners)
+- İşletme kaydı ve onay süreci
+- Departman ve hizmet yönetimi
+- Randevu görüntüleme ve onaylama/reddetme
+- Çalışma saatlerini belirleme
+- Dashboard ve istatistikler
+- Müşteri randevuları oluşturma
+- Email bildirimleri
 
-JWT Tabanlı Kimlik Doğrulama: Cookie-based güvenli oturum yönetimi
-Role-Based Access Control (RBAC): Admin ve öğrenci yetki seviyeleri
-Responsive Design: Mobil uyumlu modern arayüz
-Real-time Updates: Redux Toolkit Query ile anlık veri senkronizasyonu
-Form Validasyonu: Kapsamlı client-side ve server-side doğrulama
+### 👑 Admin Paneli
+- İşletme başvurularını onaylama/reddetme
+- Kullanıcı yönetimi
+- İşletme durumunu kontrol etme
+- Sistem istatistikleri
 
-🛠 Teknoloji Stack
-Frontend
+## 🛠️ Teknoloji Stack
 
-React 19 - Modern UI kütüphanesi
-Redux Toolkit - State management
-Redux Toolkit Query - API state management
-React Router DOM - Client-side routing
-React Hook Form - Form yönetimi ve validasyon
-Tailwind CSS - Utility-first CSS framework
-Lucide React - Modern icon seti
-React Toastify - Bildirim sistemi
-Vite - Build tool ve development server
+### Backend
+- **Node.js** - JavaScript runtime
+- **Express.js** - Web framework
+- **MongoDB** - NoSQL veritabanı
+- **Mongoose** - MongoDB object modeling
+- **JWT** - Authentication
+- **Bcryptjs** - Password hashing
+- **Nodemailer** - Email gönderimi
+- **Node-cron** - Zamanlı görevler
+- **CORS** - Cross-origin resource sharing
 
-Backend
+### Frontend
+- **React 18** - UI library
+- **Next.js 15** - React framework
+- **Tailwind CSS** - Utility-first CSS
+- **Redux Toolkit** - State management
+- **React Hook Form** - Form handling
+- **React Hot Toast** - Notifications
+- **Lucide React** - Icons
 
-Node.js - JavaScript runtime
-Express.js - Web framework
-MongoDB - NoSQL veritabanı
-Mongoose - MongoDB ODM
-JWT - JSON Web Token authentication
-bcrypt - Password hashing
-Joi - Data validation
-Cookie Parser - Cookie yönetimi
-CORS - Cross-Origin Resource Sharing
+## 📁 Proje Yapısı
 
-DevOps & Tools
-
-Docker - Containerization
-Docker Compose - Multi-container orchestration
-MongoDB Atlas - Cloud database
-Jest - Testing framework
-ESLint - Code linting
-
-📋 Gereksinimler
-
-Node.js 18+
-npm veya yarn
-MongoDB (yerel kurulum veya MongoDB Atlas)
-Git
-Docker (opsiyonel)
-
-🚀 Kurulum
-1. Projeyi Klonlayın
-bashgit clone https://github.com/yourusername/student-management-system.git
-cd student-management-system
-2. Backend Kurulumu
-bashcd server
-npm install
-Environment Variables (.env)
-envNODE_ENV=development
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/student-management-system
-JWT_SECRET=your_super_secret_jwt_key_here
-FRONTEND_URL=http://localhost:3000
-MongoDB Atlas Kullanımı (Önerilen)
-envMONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/student-management-system?retryWrites=true&w=majority
-3. Frontend Kurulumu
-bashcd client
-npm install
-Environment Variables (.env)
-envVITE_API_URL=http://localhost:5000
-🖥 Çalıştırma
-Development Modu
-Backend'i çalıştırın:
-bashcd server
-npm run dev
-Backend: http://localhost:5000
-Frontend'i çalıştırın:
-bashcd client
-npm run dev
-Frontend: http://localhost:3000
-Production Modu
-Backend Build:
-bashcd server
-npm start
-Frontend Build:
-bashcd client
-npm run build
-npm run preview
-Docker ile Çalıştırma
-bash# Tüm servisleri ayağa kaldır
-docker-compose up -d
-
-# Logları görüntüle
-docker-compose logs -f
-
-# Servisleri durdur
-docker-compose down
-
-Frontend: http://localhost:3000
-Backend API: http://localhost:5000
-
-🧪 Test
-Backend Testleri
-bashcd server
-
-# Temel API testleri
-npm test
-
-# Detaylı test çıktısı
-npm run test -- --verbose
-Test Kapsamı
-
-✅ API Health Check
-✅ User Registration
-✅ User Authentication
-✅ Protected Route Access
-✅ CRUD Operations
-
-📁 Proje Yapısı
-student-management-system/
-├── client/                    # React Frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/        # Reusable components
-│   │   │   ├── admin/         # Admin-specific components
-│   │   │   ├── common/        # Shared components
-│   │   │   └── student/       # Student-specific components
-│   │   ├── pages/             # Page components
-│   │   │   ├── admin/         # Admin pages
-│   │   │   └── student/       # Student pages
-│   │   ├── store/             # Redux store
-│   │   │   ├── api/           # RTK Query API slices
-│   │   │   └── features/      # Redux slices
-│   │   ├── utils/             # Utility functions
-│   │   ├── App.jsx            # Main App component
-│   │   └── main.jsx           # Entry point
-│   ├── package.json
-│   └── vite.config.js
-├── server/                    # Express Backend
-│   ├── config/                # Configuration files
-│   ├── controllers/           # Request handlers
-│   ├── middleware/            # Custom middleware
-│   ├── models/                # Mongoose models
-│   ├── routes/                # API routes
-│   ├── scripts/               # Database scripts
-│   ├── tests/                 # Test files
-│   ├── app.js                 # Express app setup
-│   └── package.json
-├── docker-compose.yml         # Docker configuration
+```
+├── backend/
+│   ├── controllers/         # Request handlers
+│   ├── models/             # Database models
+│   ├── routes/             # API routes
+│   ├── middleware/         # Custom middleware
+│   ├── services/           # Business logic services
+│   ├── db/                 # Database connection
+│   └── index.js            # Server entry point
+├── frontend/
+│   ├── app/                # Next.js app directory
+│   ├── components/         # Reusable components
+│   ├── store/              # Redux store
+│   └── utils/              # Utility functions
 └── README.md
-🌐 API Endpoints
-Authentication
-POST   /api/auth/login          # Kullanıcı girişi
-POST   /api/auth/logout         # Kullanıcı çıkışı  
-GET    /api/auth/profile        # Profil bilgisi
-POST   /api/auth/register       # Kullanıcı kaydı
-Admin - Student Management
-GET    /api/admin/students              # Tüm öğrenciler
-GET    /api/admin/students/:id          # Öğrenci detayı
-POST   /api/admin/students              # Yeni öğrenci
-PUT    /api/admin/students/:id          # Öğrenci güncelle
-DELETE /api/admin/students/:id          # Öğrenci sil
-Admin - Lesson Management
-GET    /api/admin/lessons               # Tüm dersler
-GET    /api/admin/lessons/:id           # Ders detayı  
-POST   /api/admin/lessons               # Yeni ders
-PUT    /api/admin/lessons/:id           # Ders güncelle
-DELETE /api/admin/lessons/:id           # Ders sil
-GET    /api/admin/lessons/stats         # Ders istatistikleri
-Admin - Enrollment Management
-GET    /api/admin/enrollments           # Tüm kayıtlar
-POST   /api/admin/enrollments           # Yeni kayıt
-DELETE /api/admin/enrollments/:id       # Kayıt sil
-GET    /api/admin/enrollments/student/:studentId  # Öğrencinin dersleri
-GET    /api/admin/enrollments/lesson/:lessonId    # Dersteki öğrenciler
-Student Portal
-GET    /api/student/profile             # Profil bilgisi
-PUT    /api/student/profile             # Profil güncelle
-GET    /api/student/lessons/my          # Kayıtlı derslerim
-GET    /api/student/lessons/available   # Kayıt açık dersler
-POST   /api/student/enroll              # Derse kayıt ol
-DELETE /api/student/drop/:lessonId      # Dersi bırak
-👥 Kullanıcı Rolleri
-Admin
+```
 
-Tüm sistem yönetimi
-Öğrenci CRUD işlemleri
-Ders CRUD işlemleri
-Kayıt yönetimi
-Raporlar ve istatistikler
+## 🚀 Kurulum
 
-Student
+### Gereksinimler
+- Node.js (18.0.0+)
+- MongoDB
+- NPM veya Yarn
 
-Profil yönetimi
-Mevcut dersleri görüntüleme
-Derse kayıt olma
-Kayıtlı derslerini görüntüleme
-Dersten ayrılma
+### Backend Kurulumu
 
-🗄 Veritabanı Şeması
-Users Collection
-javascript{
-  _id: ObjectId,
-  email: String (unique),
-  password: String (hashed),
-  role: String (admin/student),
-  firstName: String,
-  lastName: String,
-  createdAt: Date,
-  updatedAt: Date
-}
-Lessons Collection
-javascript{
-  _id: ObjectId,
-  name: String,
-  code: String (unique),
-  credits: Number,
-  capacity: Number,
-  enrolledStudentsCount: Number,
-  status: String (active/inactive),
-  description: String,
-  createdAt: Date,
-  updatedAt: Date
-}
-Enrollments Collection
-javascript{
-  _id: ObjectId,
-  student: ObjectId (ref: User),
-  lesson: ObjectId (ref: Lesson),
-  enrollmentDate: Date,
-  status: String (active/completed/dropped)
-}
-🔐 Güvenlik
+1. Backend dizinine geçin:
+```bash
+cd backend
+```
 
-JWT Authentication: HttpOnly cookie tabanlı güvenli oturum
-Password Hashing: bcrypt ile güçlü şifreleme
-Data Validation: Joi ile kapsamlı doğrulama
-CORS Protection: Cross-origin koruma
-Rate Limiting: API rate limiting (production için)
-Input Sanitization: MongoDB injection koruması
+2. Bağımlılıkları yükleyin:
+```bash
+npm install
+```
+
+3. `.env` dosyasını oluşturun:
+```env
+NODE_ENV=development
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/beauty-center
+JWT_SECRET=your_jwt_secret_key_here
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+EMAIL_SERVICE=gmail
+FRONTEND_URL=http://localhost:3000
+```
+
+4. Sunucuyu başlatın:
+```bash
+# Development mode
+npm run dev
+
+# Production mode
+npm start
+```
+
+### Frontend Kurulumu
+
+1. Frontend dizinine geçin:
+```bash
+cd frontend
+```
+
+2. Bağımlılıkları yükleyin:
+```bash
+npm install
+```
+
+3. Geliştirme sunucusunu başlatın:
+```bash
+npm run dev
+```
+
+Uygulama `http://localhost:3000` adresinde çalışacaktır.
+
+## 📱 API Endpoints
+
+### Authentication
+```
+POST /api/users/register     # Kullanıcı kaydı
+POST /api/users/login        # Giriş yapma
+POST /api/users/logout       # Çıkış yapma
+```
+
+### Beauty Centers
+```
+GET    /api/users/beauty-centers           # Tüm merkezler
+POST   /api/users/beauty-centers           # Merkez oluştur
+GET    /api/users/beauty-centers/mine      # Kendi merkezim
+PUT    /api/users/beauty-centers/mine      # Merkez güncelle
+```
+
+### Appointments
+```
+GET    /api/appointments                   # Randevularım
+POST   /api/appointments                   # Randevu oluştur
+PATCH  /api/appointments/:id/cancel        # Randevu iptal
+```
+
+### Owner Routes
+```
+GET    /api/owner/appointments             # İşletme randevuları
+PATCH  /api/owner/appointments/:id/approve # Randevu onayla
+PATCH  /api/owner/appointments/:id/reject  # Randevu reddet
+```
+
+## 🗄️ Veritabanı Modelleri
+
+### User Model
+- Kullanıcı bilgileri (ad, email, telefon, şifre)
+- Rol sistemi (user, owner, admin)
+- Hesap durumu yönetimi
+
+### BeautyCenter Model
+- İşletme bilgileri
+- Adres ve iletişim
+- Çalışma saatleri
+- Onay durumu
+
+### Appointment Model
+- Randevu detayları
+- Durum yönetimi (pending, approved, cancelled, completed)
+- İlişkiler (user, center, department, service)
+
+### Department & Service Models
+- Hiyerarşik yapı (merkez > departman > hizmet)
+- Fiyat ve süre bilgileri
+
+## 🔐 Güvenlik Özellikleri
+
+- JWT tabanlı authentication
+- Password hashing (bcrypt)
+- Role-based access control
+- Input validation ve sanitization
+- CORS yapılandırması
+- Rate limiting (implement edilebilir)
+
+## 📧 Email Servisleri
+
+- Randevu onayı bildirimleri
+- Randevu iptal bildirimleri
+- Hoş geldin mesajları
+- Şifre sıfırlama (implement edilebilir)
+
+## ⏰ Zamanlı Görevler (Cron Jobs)
+
+- Geçmiş randevuları temizleme
+- Otomatik durum güncellemeleri
+- Email hatırlatmaları
+
+## 🎨 UI/UX Özellikleri
+
+- Responsive design (mobile-first)
+- Modern ve temiz arayüz
+- Loading states ve error handling
+- Toast notifications
+- Form validations
+- Search ve filtering
+
+## 🤝 Katkı Sağlama
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır.
+
+## 👨‍💻 Geliştirici
+
+Proje hakkında sorularınız için iletişime geçebilirsiniz.
+
+## 🐛 Bilinen Sorunlar
+
+- [ ] Timezone handling improvements needed
+- [ ] Advanced search filters can be added
+- [ ] Push notifications can be implemented
+
+## 🔮 Gelecek Özellikler
+
+- [ ] Mobile app (React Native)
+- [ ] Payment integration
+- [ ] Advanced analytics
+- [ ] Multi-language support
+- [ ] Social media login
+- [ ] Review and rating system
+
+---
+
+⭐ Bu projeyi beğendiyseniz star vermeyi unutmayın!
