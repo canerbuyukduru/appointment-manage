@@ -1,36 +1,38 @@
-// lib/store.js - Final complete version
+// lib/store.js - Comment API ile güncellenmiş versiyon
 import { configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
-import storage from 'redux-persist/lib/storage' // localStorage kullanır
+import storage from 'redux-persist/lib/storage'
 import { combineReducers } from '@reduxjs/toolkit'
 
 // API imports
 import { authApi } from './services/authApi'
-import { adminApi } from './services/adminApi'           // ✅ AdminApi eklendi
+import { adminApi } from './services/adminApi'
 import { beautyCenterApi } from './services/beautyCenterApi'
 import { departmentApi } from './services/departmentApi'
 import { serviceApi } from './services/serviceApi'
 import { appointmentApi } from './services/appointmentApi'
+import { commentApi } from './services/commentApi' // 🆕 Comment API eklendi
 
 // Slice imports
 import authSlice from './features/authSlice'
 
 // Persist ayarları
 const persistConfig = {
-  key: 'root',                    // localStorage key'i
-  storage,                        // localStorage kullan
-  whitelist: ['auth']             // Sadece auth slice'ını sakla
+  key: 'root',
+  storage,
+  whitelist: ['auth'] // Sadece auth slice'ını sakla
 }
 
 // Root reducer oluştur
 const rootReducer = combineReducers({
   auth: authSlice,
   [authApi.reducerPath]: authApi.reducer,
-  [adminApi.reducerPath]: adminApi.reducer,              // ✅ AdminApi reducer eklendi
+  [adminApi.reducerPath]: adminApi.reducer,
   [beautyCenterApi.reducerPath]: beautyCenterApi.reducer,
   [departmentApi.reducerPath]: departmentApi.reducer,
   [serviceApi.reducerPath]: serviceApi.reducer,
-  [appointmentApi.reducerPath]: appointmentApi.reducer
+  [appointmentApi.reducerPath]: appointmentApi.reducer,
+  [commentApi.reducerPath]: commentApi.reducer, // 🆕 Comment API reducer
 })
 
 // Persist ile sarılmış reducer
@@ -51,14 +53,15 @@ export const store = configureStore({
         ],
       },
     }).concat(
-      authApi.middleware, 
-      adminApi.middleware,              // ✅ AdminApi middleware eklendi
-      beautyCenterApi.middleware, 
-      departmentApi.middleware, 
-      serviceApi.middleware, 
-      appointmentApi.middleware
+      authApi.middleware,
+      adminApi.middleware,
+      beautyCenterApi.middleware,
+      departmentApi.middleware,
+      serviceApi.middleware,
+      appointmentApi.middleware,
+      commentApi.middleware, // 🆕 Comment API middleware
     ),
 })
 
-// Persistor oluştur (React'te kullanmak için)
+// 🔥 Persistor'ı export et
 export const persistor = persistStore(store)

@@ -49,7 +49,7 @@ export const authApi = createApi({
 
     // Mevcut kullanıcı bilgisi
     getCurrentUser: builder.query({
-      query: () => '/users/me',
+      query: () => '/users/profile',
       providesTags: ['User'],
     }),
 

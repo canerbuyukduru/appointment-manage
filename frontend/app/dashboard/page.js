@@ -292,14 +292,6 @@ function DashboardContent() {
             </div>
           </div>
         </div>
-
-        {/* Debug Info (Geliştirme için) */}
-        <div className="bg-gray-800 text-white rounded-xl p-4 text-sm">
-          <h4 className="font-semibold mb-2">Debug Info:</h4>
-          <pre className="text-xs overflow-x-auto">
-            {JSON.stringify({ user, isAuthenticated }, null, 2)}
-          </pre>
-        </div>
       </div>
 
       {/* 🎭 Profile Update Modal */}

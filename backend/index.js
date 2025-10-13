@@ -14,7 +14,7 @@ import departmentRoutes from './routes/departmentRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import availabilityRoutes from './routes/availabilityRoutes.js';
-
+import commentRoutes from './routes/commentRoutes.js';
 
 import cors from 'cors';
 import { authenticate, authorizeAdmin } from './middleware/authMiddleware.js';
@@ -99,8 +99,9 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/appointments", appointmentsRoutes);
 app.use("/api/admin", adminRoutes); 
-
 app.use("/api/availability", availabilityRoutes);
+app.use('/api/comments', commentRoutes); 
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
