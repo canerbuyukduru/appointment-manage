@@ -90,7 +90,7 @@ function OwnerDashboardContent() {
             <Building className="mx-auto text-purple-500 mb-6" size={80} />
             <h1 className="text-3xl font-bold text-gray-900 mb-4">İşletmenizi Oluşturun</h1>
             <p className="text-gray-600 mb-8 text-lg">
-              Dashboard'unuzu görüntülemek için önce işletme bilgilerinizi oluşturmanız gerekiyor.
+              Dashboard&apos;unuzu görüntülemek için önce işletme bilgilerinizi oluşturmanız gerekiyor.
             </p>
             <Link 
               href="/owner/beauty-center"

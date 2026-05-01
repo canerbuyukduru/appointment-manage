@@ -23,11 +23,14 @@ export default function AdminLoginPage() {
     return null
   }
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm()
+  // Move this to the top of the component (always call it)
+  const formMethods = useForm({
+    defaultValues: { email: '', password: '' },
+    mode: 'onSubmit',
+  });
+
+  // Use these from formMethods later (do NOT call useForm conditionally)
+  const { register, handleSubmit, formState: { errors } } = formMethods;
 
   const onSubmit = async (data) => {
     try {

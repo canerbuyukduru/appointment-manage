@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  mongodb:
+    image: mongo:6.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password123}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - appnet
+
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    networks:
+      - appnet
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - appnet
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+
+networks:
+  appnet:
+    driver: bridge

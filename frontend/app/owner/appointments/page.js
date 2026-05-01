@@ -27,6 +27,7 @@ import {
   Mail,
 } from "lucide-react";
 import Link from "next/link";
+import EmailStatusBadge from "@/components/EmailStatusBadge";
 
 function OwnerAppointmentsManager() {
   const router = useRouter();
