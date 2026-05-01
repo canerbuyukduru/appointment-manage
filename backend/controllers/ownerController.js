@@ -210,7 +210,7 @@ export const getOwnerAppointments = asyncHandler(async (req, res) => {
   const center = await BeautyCenter.findOne({ ownerId: req.user._id });
   if (!center) {
     res.status(404);
-    throw new Error("Beauty center not found for this owner");
+    throw new Error("Bu işletmeye ait güzellik merkezi bulunamadı");
   }
 
   // 2) Filter objesi oluştur
@@ -256,7 +256,7 @@ export const ownerApproveAppointment = asyncHandler(async (req, res) => {
   const center = await getOwnerCenter(req.user._id);
   if (!center) {
     res.status(404);
-    throw new Error("Beauty center not found");
+    throw new Error("Güzellik merkezi bulunamadı");
   }
 
   const appt = await Appointment.findOne({
@@ -268,11 +268,11 @@ export const ownerApproveAppointment = asyncHandler(async (req, res) => {
 
   if (!appt) {
     res.status(404);
-    throw new Error("Appointment not found");
+    throw new Error("Randevu bulunamadı");
   }
   if (appt.status !== "pending") {
     res.status(400);
-    throw new Error("Only pending appointments can be approved");
+    throw new Error("Sadece bekleyen randevular onaylanabilir");
   }
 
   appt.status = "approved";
@@ -291,13 +291,12 @@ export const ownerApproveAppointment = asyncHandler(async (req, res) => {
         centerAddress: center.address
       });
     }
-    console.log('📧 Appointment approval email sent');
   } catch (emailError) {
     console.error('📧 Email sending failed:', emailError);
   }
 
   res.json({ 
-    message: "Appointment approved", 
+    message: "Randevu onaylandı", 
     appointment: appt,
     emailSent: appt.userId.email ? true : false
   });
@@ -309,7 +308,7 @@ export const ownerRejectAppointment = asyncHandler(async (req, res) => {
   const center = await getOwnerCenter(req.user._id);
   if (!center) {
     res.status(404);
-    throw new Error("Beauty center not found");
+    throw new Error("Güzellik merkezi bulunamadı");
   }
 
   const appt = await Appointment.findOne({
@@ -321,11 +320,11 @@ export const ownerRejectAppointment = asyncHandler(async (req, res) => {
 
   if (!appt) {
     res.status(404);
-    throw new Error("Appointment not found");
+    throw new Error("Randevu bulunamadı");
   }
   if (!["pending", "approved"].includes(appt.status)) {
     res.status(400);
-    throw new Error("This appointment cannot be rejected");
+    throw new Error("Bu randevu reddedilemez");
   }
 
   appt.status = "rejected";
@@ -343,13 +342,12 @@ export const ownerRejectAppointment = asyncHandler(async (req, res) => {
         rejectionReason: notes
       });
     }
-    console.log('📧 Appointment rejection email sent');
   } catch (emailError) {
     console.error('📧 Email sending failed:', emailError);
   }
 
   res.json({ 
-    message: "Appointment rejected", 
+    message: "Randevu reddedildi", 
     appointment: appt,
     emailSent: appt.userId.email ? true : false
   });
@@ -394,7 +392,6 @@ export const ownerMarkAttendance = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Randevu başlamadan attendance işaretlenemez.");
   }
-  // İstersen daha sıkı: if (appt.endDateTime > now) { throw new Error("Randevu bitmeden işaretlenemez."); }
 
   appt.attended = attended;
   appt.status = attended ? "completed" : "no-show";
@@ -418,7 +415,7 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
   const center = await BeautyCenter.findOne({ ownerId: req.user._id });
   if (!center) {
     res.status(404);
-    throw new Error("Beauty center not found");
+    throw new Error("Güzellik merkezi bulunamadı");
   }
 
   const appointment = await Appointment.findOne({
@@ -428,7 +425,7 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
 
   if (!appointment) {
     res.status(404);
-    throw new Error("Appointment not found");
+    throw new Error("Randevu bulunamadı");
   }
 
   appointment.status = status;
@@ -440,7 +437,7 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Appointment status updated",
+    message: "Randevu durumu güncellendi",
     appointment,
   });
 });
@@ -472,7 +469,7 @@ export const createAppointmentForCustomer = asyncHandler(async (req, res) => {
   const center = await getOwnerCenter(req.user._id);
   if (!center) {
     res.status(404);
-    throw new Error("Beauty center bulunamadı.");
+    throw new Error("Güzellik merkezi bulunamadı.");
   }
 
   // Departman ve hizmet kontrolü
@@ -606,10 +603,8 @@ export const createAppointmentForCustomer = asyncHandler(async (req, res) => {
       });
     }
 
-    console.log('📧 Email notifications sent successfully');
   } catch (emailError) {
     console.error('📧 Email sending failed:', emailError);
-    // Email hatası uygulamayı durdurmasın, sadece log'la
   }
 
   res.status(201).json({

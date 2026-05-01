@@ -109,7 +109,7 @@ export default function LoginPage() {
                 },
               })}
               type="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
               placeholder="ornek@email.com"
             />
             {errors.email && (
@@ -128,7 +128,7 @@ export default function LoginPage() {
                   required: 'Şifre zorunludur',
                 })}
                 type={showPassword ? 'text' : 'password'}
-                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 pr-12 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 placeholder="••••••••"
               />
               <button

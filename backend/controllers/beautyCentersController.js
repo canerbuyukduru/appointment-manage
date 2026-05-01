@@ -19,7 +19,7 @@ export const createBeautyCenter = asyncHandler(async (req, res) => {
 
   if (!name || !address || !phone) {
     res.status(400);
-    throw new Error("Name, address and phone are required");
+    throw new Error("isim, adres ve telefon numarası zorunludur");
   }
 
   const beautyCenter = new BeautyCenter({
@@ -51,7 +51,7 @@ export const getMyBeautyCenter = asyncHandler(async (req, res) => {
 
   if (!beautyCenter) {
     res.status(404);
-    throw new Error("Beauty center not found.");
+    throw new Error("Güzellik merkezi bulunamadı.");
   }
 
   res.json(beautyCenter);
@@ -64,7 +64,7 @@ export const updateMyBeautyCenter = asyncHandler(async (req, res) => {
 
   if (!beautyCenter) {
     res.status(404);
-    throw new Error("Beauty center not found.");
+    throw new Error("Güzellik merkezi bulunamadı.");
   }
 
   // sadece gelen alanları güncelle

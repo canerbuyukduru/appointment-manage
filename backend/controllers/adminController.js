@@ -214,7 +214,7 @@ export const getOwnerDetails = asyncHandler(async (req, res) => {
 
   if (!owner) {
     res.status(404);
-    throw new Error("Owner not found");
+    throw new Error("İşletme Sahibi bulunamadı.");
   }
 
   // Beauty center bilgilerini al
@@ -273,7 +273,7 @@ export const approveOwner = asyncHandler(async (req, res) => {
 
   if (!owner) {
     res.status(404);
-    throw new Error("Owner not found");
+    throw new Error("İşletme Sahibi bulunamadı.");
   }
 
   if (owner.isApproved) {
@@ -283,7 +283,7 @@ export const approveOwner = asyncHandler(async (req, res) => {
       await beautyCenter.save();
     } else {
       res.status(400);
-      throw new Error("Owner is already approved");
+      throw new Error("İşletme Sahibi zaten onaylanmış.");
     }
   }
 
@@ -303,7 +303,7 @@ export const approveOwner = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Owner approved successfully",
+    message: "İşletme Sahibi başarıyla onaylandı.",
     owner: {
       id: owner._id,
       fullName: owner.fullName,
@@ -323,19 +323,19 @@ export const rejectOwner = asyncHandler(async (req, res) => {
 
   if (!reason || reason.trim().length === 0) {
     res.status(400);
-    throw new Error("Rejection reason is required");
+    throw new Error("Reddetme nedeni gerekli");
   }
 
   const owner = await User.findOne({ _id: id, role: "owner" });
 
   if (!owner) {
     res.status(404);
-    throw new Error("Owner not found");
+    throw new Error("İşletme Sahibi bulunamadı.");
   }
 
   if (owner.isApproved) {
     res.status(400);
-    throw new Error("Cannot reject an approved owner");
+    throw new Error("Onaylanmış bir işletme sahibi reddedilemez. Önce onayı kaldırın.");
   }
 
   // Owner'ı ban'le (rejected olarak işaretlemek için)
@@ -354,7 +354,7 @@ export const rejectOwner = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Owner rejected successfully",
+    message: "İşletme Sahibi başarıyla reddedildi.",
     owner: {
       id: owner._id,
       fullName: owner.fullName,
@@ -433,18 +433,18 @@ export const toggleUserBan = asyncHandler(async (req, res) => {
 
   if (!user) {
     res.status(404);
-    throw new Error("User not found");
+    throw new Error("Kullanıcı bulunamadı");
   }
 
   if (user.role === "admin") {
     res.status(403);
-    throw new Error("Cannot ban admin users");
+    throw new Error("Admin kullanıcılar yasaklanamaz");
   }
 
   if (action === "ban") {
     if (!reason || reason.trim().length === 0) {
       res.status(400);
-      throw new Error("Ban reason is required");
+      throw new Error("Yasaklama nedeni gerekli");
     }
 
     user.isBanned = true;
@@ -458,14 +458,14 @@ export const toggleUserBan = asyncHandler(async (req, res) => {
     // await sendUnbanNotificationEmail(user.email);
   } else {
     res.status(400);
-    throw new Error('Invalid action. Use "ban" or "unban"');
+    throw new Error('Geçersiz işlem. "ban" veya "unban" kullanın');
   }
 
   await user.save();
 
   res.json({
     success: true,
-    message: `User ${action === "ban" ? "banned" : "unbanned"} successfully`,
+    message: `Kullanıcı başarıyla ${action === "ban" ? "yasaklandı" : "yasaklaması kaldırıldı"}`,
     user: {
       id: user._id,
       fullName: user.fullName,
@@ -539,13 +539,13 @@ export const toggleBeautyCenterStatus = asyncHandler(async (req, res) => {
 
   if (!center) {
     res.status(404);
-    throw new Error("Beauty center not found");
+    throw new Error("İşletme centerı bulunamadı");
   }
 
   if (action === "suspend") {
     if (!reason || reason.trim().length === 0) {
       res.status(400);
-      throw new Error("Suspension reason is required");
+      throw new Error("Askıya alma nedeni gerekli");
     }
 
     center.isApproved = false;
@@ -559,7 +559,7 @@ export const toggleBeautyCenterStatus = asyncHandler(async (req, res) => {
     // await sendActivationEmail(center.ownerId.email, center.name);
   } else {
     res.status(400);
-    throw new Error('Invalid action. Use "suspend" or "activate"');
+    throw new Error('Geçersiz işlem. "suspend" veya "activate" kullanın');
   }
 
   await center.save();
@@ -567,7 +567,7 @@ export const toggleBeautyCenterStatus = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: `Beauty center ${
-      action === "suspend" ? "suspended" : "activated"
+      action === "suspend" ? "askıya alındı" : "etkinleştirildi"
     } successfully`,
     center: {
       id: center._id,

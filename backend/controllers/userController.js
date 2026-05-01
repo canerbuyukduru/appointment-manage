@@ -3,18 +3,44 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 import generateToken from "../utils/createToken.js";
 import BeautyCenter from "../models/beautyCentersModel.js";
+import validator from 'validator';
 
 // POST /api/users/register
 // Public
 export const registerUser = asyncHandler(async (req, res) => {
   let { fullName, email, password, phone } = req.body;
 
+  // Validate
   if (!fullName || !email || !password || !phone) {
     res.status(400);
-    throw new Error("fullName, email, password, phone zorunludur");
+    throw new Error("Tüm alanlar zorunludur");
   }
 
-  email = email.toLowerCase();
+  email = email.toLowerCase().trim();
+  
+  // Email format
+  if (!validator.isEmail(email)) {
+    res.status(400);
+    throw new Error("Geçersiz email formatı");
+  }
+
+  // Password strength
+  if (!validator.isStrongPassword(password, {
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1
+  })) {
+    res.status(400);
+    throw new Error("Şifre: En az 8 karakter, büyük/küçük harf, sayı ve sembol içermeli");
+  }
+
+  // Phone validation
+  if (!validator.isMobilePhone(phone, 'tr-TR')) {
+    res.status(400);
+    throw new Error("Geçersiz telefon numarası");
+  }
 
   const existing = await User.findOne({ email });
   if (existing) {

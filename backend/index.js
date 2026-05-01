@@ -2,8 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './db/db.js';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 import cronService from './services/cronService.js';
+import { loginLimiter, registerLimiter, generalLimiter } from './middleware/rateLimiter.js';
 
 // Routes
 import userRoutes from './routes/userRoutes.js';
@@ -45,12 +47,16 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with']
 };
 
+app.use(helmet());
 app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser());
+
+// ✅ Genel rate limiter (tüm istekler için)
+app.use(generalLimiter);
 
 // Express app oluşturduktan sonra ve routes'tan önce ekle:
 
@@ -91,7 +97,7 @@ app.get('/api/admin/cron-status', authenticate, authorizeAdmin, (req, res) => {
   }
 });
 
-// User routes
+// User routes (loginLimiter, registerLimiter burada kullanılacak)
 app.use("/api/users", userRoutes);
 app.use("/api/owners", ownerRoutes);
 app.use("/api/beauty-centers", beautyCentersRoutes);

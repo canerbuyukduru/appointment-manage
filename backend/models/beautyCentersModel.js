@@ -61,6 +61,7 @@ const beautyCenterSchema = new mongoose.Schema(
 
 beautyCenterSchema.index({ ownerId: 1 });
 beautyCenterSchema.index({ isApproved: 1 });
+beautyCenterSchema.index({ email: 1 });
 
 const BeautyCenter = mongoose.model("BeautyCenter", beautyCenterSchema);
 export default BeautyCenter;

@@ -128,7 +128,7 @@ function DashboardContent() {
             <button
               onClick={handleLogout}
               disabled={isLoading}
-              className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+              className="cursor-pointer flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
             >
               <LogOut size={18} />
               {isLoading ? "Çıkış yapılıyor..." : "Çıkış Yap"}
