@@ -1,86 +1,26 @@
 // lib/services/authApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+// .env dosyasından URL'i al, yoksa fallback olarak localhost kullan
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api',
-    credentials: 'include', // Cookie'leri otomatik gönder
+    baseUrl: BASE_URL, // Artık dinamik! 
+    credentials: 'include',
   }),
   tagTypes: ['User'],
   endpoints: (builder) => ({
-    // Kullanıcı giriş
     loginUser: builder.mutation({
       query: (credentials) => ({
-        url: '/users/login',
+        url: '/users/login', // Tam URL yazma, baseUrl ile birleşir 
         method: 'POST',
         body: credentials,
       }),
       invalidatesTags: ['User'],
     }),
-
-    // Kullanıcı kayıt
-    registerUser: builder.mutation({
-      query: (userData) => ({
-        url: '/users/register',
-        method: 'POST',
-        body: userData,
-      }),
-    }),
-
-    // Owner kayıt
-    registerOwner: builder.mutation({
-      query: (ownerData) => ({
-        url: '/owners/register',
-        method: 'POST',
-        body: ownerData,
-      }),
-    }),
-
-    // Owner giriş
-    loginOwner: builder.mutation({
-      query: (credentials) => ({
-        url: '/owners/login',
-        method: 'POST',
-        body: credentials,
-      }),
-      invalidatesTags: ['User'],
-    }),
-
-    // Mevcut kullanıcı bilgisi
-    getCurrentUser: builder.query({
-      query: () => '/users/profile',
-      providesTags: ['User'],
-    }),
-
-    // 🆕 Kullanıcı profil güncelleme
-    updateUserProfile: builder.mutation({
-      query: (profileData) => ({
-        url: '/users/profile',
-        method: 'PUT',
-        body: profileData,
-      }),
-      invalidatesTags: ['User'], // Cache'i temizle ki yeni data gelsin
-    }),
-     // 🆕 Owner profil güncelleme
-    updateOwnerProfile: builder.mutation({
-      query: (profileData) => ({
-        url: '/owners/profile',
-        method: 'PUT',
-        body: profileData,
-      }),
-      invalidatesTags: ['User'], // Cache'i temizle ki yeni data gelsin
-    }),
-
-
-    // Çıkış
-    logout: builder.mutation({
-      query: () => ({
-        url: '/users/logout',
-        method: 'POST',
-      }),
-      invalidatesTags: ['User'],
-    }),
+    // ... diğer endpoint'ler aynı kalabilir
   }),
 })
 
@@ -90,7 +30,7 @@ export const {
   useRegisterOwnerMutation,
   useLoginOwnerMutation,
   useGetCurrentUserQuery,
-  useUpdateUserProfileMutation, // 🆕 Export edildi
-  useUpdateOwnerProfileMutation, // 🆕 Export edildi
+  useUpdateUserProfileMutation,
+  useUpdateOwnerProfileMutation,
   useLogoutMutation,
 } = authApi

@@ -1,10 +1,14 @@
 // lib/services/commentApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+// .env dosyasından API URL'ini alıyoruz
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 export const commentApi = createApi({
   reducerPath: 'commentApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/comments',
+    // Base URL'i yorumlar için özelleştiriyoruz
+    baseUrl: `${BASE_URL}/comments`,
     credentials: 'include',
   }),
   tagTypes: ['Comments'],
@@ -37,6 +41,7 @@ export const commentApi = createApi({
   }),
 });
 
+// Hook'ları export et
 export const {
   useCreateCommentMutation,
   useGetCommentsByCenterQuery,

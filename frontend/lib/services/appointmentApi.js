@@ -1,64 +1,62 @@
 // lib/services/appointmentApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// .env dosyasından URL'i çek, yoksa varsayılan olarak localhost kullan
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export const appointmentApi = createApi({
   reducerPath: "appointmentApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/appointments",
+    // Temel API adresi (Tüm isteklerin başına otomatik eklenir)
+    baseUrl: `${BASE_URL}/api`, 
     credentials: "include",
   }),
   tagTypes: ["Appointment"],
   endpoints: (builder) => ({
-    // Kullanıcı randevu oluşturur
     createAppointment: builder.mutation({
       query: (appointmentData) => ({
-        url: "/",
+        url: "/appointments", // Sadece son eki yazıyoruz
         method: "POST",
         body: appointmentData,
       }),
       invalidatesTags: ["Appointment"],
     }),
 
-    // Kullanıcının kendi randevularını görüntülemesi
     getMyAppointments: builder.query({
-      query: () => "/my",
+      query: () => "/appointments/my",
       providesTags: ["Appointment"],
     }),
 
-    // Kullanıcının kendi randevusunu iptal etmesi
-    cancelAppointment: builder.mutation({
-      query: (id) => ({
-        url: `/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["Appointment"],
-    }),
-
-    // Owner'ın işletmesine gelen randevuları görüntülemesi
     getOwnerAppointments: builder.query({
       query: (params = {}) => {
         const searchParams = new URLSearchParams();
-        if (params.status && params.status !== "all")
-          searchParams.append("status", params.status);
+        if (params.status && params.status !== "all") searchParams.append("status", params.status);
         if (params.date) searchParams.append("date", params.date);
 
-        // Backend route: /api/owners/appointments
-        return {
-          url: `http://localhost:5000/api/owners/appointments?${searchParams.toString()}`,
-        };
+        // baseUrl zaten "/api" ile bittiği için sadece devamını yazıyoruz
+        return `/owners/appointments?${searchParams.toString()}`;
       },
       providesTags: ["Appointment"],
     }),
 
-    // Owner randevu durumunu günceller (approve/reject)
     updateAppointmentStatus: builder.mutation({
       query: ({ id, status, notes }) => ({
-        url: `http://localhost:5000/api/owners/appointments/${id}/status`,
+        url: `/owners/appointments/${id}/status`,
         method: "PATCH",
         body: { status, notes },
       }),
       invalidatesTags: ["Appointment"],
     }),
+
+    createAppointmentForCustomer: builder.mutation({
+      query: (appointmentData) => ({
+        url: `/owners/appointments/create-for-customer`,
+        method: "POST",
+        body: appointmentData,
+      }),
+      invalidatesTags: ["Appointment"],
+    }),
+    
     getAvailableSlots: builder.query({
       query: ({ beautyCenterId, departmentId, serviceId, date }) => {
         const params = new URLSearchParams();
@@ -67,22 +65,13 @@ export const appointmentApi = createApi({
         if (serviceId) params.append("serviceId", serviceId);
         if (date) params.append("date", date);
 
-        return `/availability?${params.toString()}`;
+        return `/appointments/availability?${params.toString()}`;
       },
       providesTags: ["Appointment"],
-    }),
-    createAppointmentForCustomer: builder.mutation({
-      query: (appointmentData) => ({
-        url: `http://localhost:5000/api/owners/appointments/create-for-customer`,
-        method: "POST",
-        body: appointmentData,
-      }),
-      invalidatesTags: ["Appointment", "OwnerAppointments"],
     }),
   }),
 });
 
-// Hook'ları export et
 export const {
   useCreateAppointmentMutation,
   useGetMyAppointmentsQuery,
@@ -93,5 +82,4 @@ export const {
   useCreateAppointmentForCustomerMutation,
 } = appointmentApi;
 
-// Default export da ekle
 export default appointmentApi;

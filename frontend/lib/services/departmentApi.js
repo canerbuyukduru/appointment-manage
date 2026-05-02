@@ -1,10 +1,14 @@
 // lib/services/departmentApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-const departmentApi = createApi({
+// Çevresel değişkeni al, yoksa localhost'u kullan
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+export const departmentApi = createApi({
   reducerPath: 'departmentApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/departments',
+    // Dinamik base URL yapısı
+    baseUrl: `${BASE_URL}/departments`,
     credentials: 'include',
   }),
   tagTypes: ['Department'],
@@ -46,7 +50,7 @@ const departmentApi = createApi({
   }),
 })
 
-// Named exports
+// Hook'ları export et
 export const {
   useCreateDepartmentMutation,
   useGetDepartmentsQuery,
@@ -56,4 +60,3 @@ export const {
 
 // Default export
 export default departmentApi
-export { departmentApi }

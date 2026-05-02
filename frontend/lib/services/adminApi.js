@@ -4,7 +4,9 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/admin',
+    const baseURL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api/admin` 
+  : 'http://localhost:5000/api/admin';
     credentials: 'include', // Cookie'leri gönder
   }),
   tagTypes: ['AdminStats', 'PendingOwners', 'AllOwners', 'AllUsers', 'BeautyCenters', 'OwnerDetails'],

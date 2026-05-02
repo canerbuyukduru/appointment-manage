@@ -1,10 +1,14 @@
 // lib/services/serviceApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+// Çevresel değişkeni al, yoksa fallback olarak localhost kullan
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 export const serviceApi = createApi({
   reducerPath: 'serviceApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/services',
+    // Artık URL'miz dinamik
+    baseUrl: `${BASE_URL}/services`,
     credentials: 'include',
   }),
   tagTypes: ['Service'],
@@ -61,5 +65,5 @@ export const {
   useDeleteServiceMutation,
 } = serviceApi
 
-// Default export da ekle
+// Default export
 export default serviceApi
