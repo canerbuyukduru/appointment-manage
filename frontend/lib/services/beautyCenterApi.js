@@ -1,8 +1,8 @@
 // lib/services/beautyCenterApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// .env dosyasından gelen URL'i kullan, yoksa fallback olarak localhost kullan
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Environment'dan gelen URL'i kullan, yoksa fallback olarak localhost kullan
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const beautyCenterApi = createApi({
   reducerPath: 'beautyCenterApi',

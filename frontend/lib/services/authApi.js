@@ -1,8 +1,8 @@
 // lib/services/authApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// .env dosyasından URL'i al, yoksa fallback olarak localhost kullan
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+// Environment'dan URL'i al, yoksa fallback olarak localhost kullan
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const authApi = createApi({
   reducerPath: 'authApi',

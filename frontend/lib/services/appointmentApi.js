@@ -1,8 +1,8 @@
 // lib/services/appointmentApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// .env dosyasından URL'i çek, yoksa varsayılan olarak localhost kullan
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// Environment'dan URL'i çek, yoksa varsayılan olarak localhost kullan
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export const appointmentApi = createApi({
   reducerPath: "appointmentApi",

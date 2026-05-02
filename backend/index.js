@@ -28,16 +28,14 @@ const app = express();
 app.set("trust proxy", 1);
 
 connectDB();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 const whitelist = [
   process.env.FRONTEND_URL,
-  "http://localhost:5173",
+  // Development URLs
   "http://localhost:3000",
   "http://localhost:3001",
-  "http://localhost",
-  "http://127.0.0.1:5173",
-  "http://127.0.0.1",
+  "http://127.0.0.1:3000",
 ].filter(Boolean);
 
 const corsOptions = {

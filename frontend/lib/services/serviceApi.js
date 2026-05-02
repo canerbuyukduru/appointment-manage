@@ -1,8 +1,8 @@
 // lib/services/serviceApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// Çevresel değişkeni al, yoksa fallback olarak localhost kullan
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Environment değişkenini al, yoksa fallback olarak localhost kullan
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const serviceApi = createApi({
   reducerPath: 'serviceApi',

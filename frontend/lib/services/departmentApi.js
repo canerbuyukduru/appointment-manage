@@ -1,8 +1,8 @@
 // lib/services/departmentApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// Çevresel değişkeni al, yoksa localhost'u kullan
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Environment değişkenini al, yoksa localhost'u kullan
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const departmentApi = createApi({
   reducerPath: 'departmentApi',

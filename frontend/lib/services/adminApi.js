@@ -1,12 +1,15 @@
 // lib/services/adminApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+// Değişkeni fonksiyonun DIŞINDA tanımlıyoruz
+const baseUrl = process.env.NEXT_PUBLIC_API_URL 
+  ? `${process.env.NEXT_PUBLIC_API_URL}/admin` 
+  : 'http://localhost:5000/api/admin';
 
+  
 export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: fetchBaseQuery({
-    const baseURL = import.meta.env.VITE_API_URL 
-  ? `${import.meta.env.VITE_API_URL}/api/admin` 
-  : 'http://localhost:5000/api/admin';
+    baseUrl: baseUrl,
     credentials: 'include', // Cookie'leri gönder
   }),
   tagTypes: ['AdminStats', 'PendingOwners', 'AllOwners', 'AllUsers', 'BeautyCenters', 'OwnerDetails'],

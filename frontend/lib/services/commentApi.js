@@ -1,8 +1,8 @@
 // lib/services/commentApi.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// .env dosyasından API URL'ini alıyoruz
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Environment'dan API URL'ini alıyoruz
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const commentApi = createApi({
   reducerPath: 'commentApi',
