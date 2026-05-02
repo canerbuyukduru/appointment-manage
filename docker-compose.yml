@@ -28,9 +28,12 @@ services:
     build:
       context: ./frontend
     ports:
-      - "80:80"
+      - "3000:3000"   # hostPort:containerPort — hostta 3000 meşgulse "3001:3000" kullan
     depends_on:
       - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:5000
+      - NODE_ENV=production
     networks:
       - appnet
     restart: unless-stopped
