@@ -1,6 +1,11 @@
 FROM node:18-bullseye AS builder
 WORKDIR /app
 
+# Build arguments
+ARG NEXT_PUBLIC_API_URL=http://backend:5000/api
+
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # install deps
 COPY package*.json ./
 RUN npm ci
