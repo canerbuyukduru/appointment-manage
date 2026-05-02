@@ -48,6 +48,14 @@ export const appointmentApi = createApi({
       invalidatesTags: ["Appointment"],
     }),
 
+    cancelAppointment: builder.mutation({
+      query: (appointmentId) => ({
+        url: `/appointments/${appointmentId}/cancel`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Appointment"],
+    }),
+
     createAppointmentForCustomer: builder.mutation({
       query: (appointmentData) => ({
         url: `/owners/appointments/create-for-customer`,
