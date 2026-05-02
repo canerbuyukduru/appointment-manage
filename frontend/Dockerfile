@@ -2,7 +2,7 @@ FROM node:18-bullseye AS builder
 WORKDIR /app
 
 # Build arguments
-ARG NEXT_PUBLIC_API_URL=http://backend:5000/api
+ARG NEXT_PUBLIC_API_URL=http://145.223.81.130:5000/api
 
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
