@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password123}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-C.nemesis123}
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -30,12 +30,13 @@ services:
     build:
       context: ./frontend
       args:
-        - NEXT_PUBLIC_API_URL=http://backend:5000/api
+        - NEXT_PUBLIC_API_URL=http://145.223.81.130:5000/api
     ports:
       - "3000:3000"   # hostPort:containerPort — hostta 3000 meşgulse "3001:3000" kullan
     depends_on:
       - backend
     environment:
+      - NEXT_PUBLIC_API_URL=http://145.223.81.130:5000/api
       - NODE_ENV=production
     networks:
       - appnet
