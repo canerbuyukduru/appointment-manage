@@ -1,0 +1,62 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npx prisma *)",
+      "Bash(npx playwright *)",
+      "Bash(docker compose *)",
+      "Bash(docker build *)",
+      "Bash(node *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(docker system prune *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[Hook] File modified — remember to run lint if in frontend/ or backend/\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[Hook] Running bash command in appointment-manager\""
+          }
+        ]
+      }
+    ]
+  },
+  "agents": {
+    "frontend": {
+      "description": "Next.js frontend developer — UI, components, pages, state",
+      "contextFile": "frontend/CLAUDE.md"
+    },
+    "backend": {
+      "description": "Express + Prisma backend developer — API, DB, auth, jobs",
+      "contextFile": "backend/CLAUDE.md"
+    },
+    "test": {
+      "description": "QA engineer — unit tests, integration tests, E2E tests",
+      "contextFile": "tests/CLAUDE.md"
+    },
+    "devops": {
+      "description": "DevOps engineer — Docker, CI/CD, infrastructure",
+      "contextFile": "devops/CLAUDE.md"
+    }
+  }
+}

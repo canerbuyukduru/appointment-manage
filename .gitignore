@@ -1,0 +1,52 @@
+# ---- Ortam değişkenleri (asla commit'leme) ----
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ---- Node ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ---- Next.js ----
+frontend/.next/
+frontend/out/
+frontend/.vercel
+
+# ---- Backend build ----
+backend/dist/
+backend/build/
+
+# ---- Prisma ----
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# ---- Test & Coverage ----
+coverage/
+.nyc_output/
+tests/playwright-report/
+tests/test-results/
+
+# ---- IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ---- Docker ----
+docker-compose.override.yml
+
+# ---- Loglar ----
+logs/
+*.log
+
+# ---- OS ----
+.DS_Store
+Desktop.ini

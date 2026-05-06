@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker --version)",
+      "Bash(docker exec randevu_backend *)",
+      "Bash(xargs grep -L \"next\\(err\\)\\\\|NextFunction\")",
+      "Bash(docker exec randevu_frontend *)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\user\\\\Desktop\\\\appointment-manager\\\\frontend\\\\public\")",
+      "Bash(Out-Null)",
+      "Bash(Write-Output \"OK\")",
+      "Bash(powershell.exe *)"
+    ]
+  },
+  "enabledPlugins": {
+    "codex@openai-codex": true
+  }
+}

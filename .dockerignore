@@ -1,0 +1,25 @@
+# Root .dockerignore — docker build context'ten hariç tut
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Her servisin kendi Dockerfile'ı var — diğer servisleri hariç tut
+frontend/
+tests/
+devops/
+
+# Geliştirme araçları
+README.md
+CLAUDE.md
+.claude/
+*.md
+
+# IDE
+.vscode/
+.idea/
+
+# Loglar
+logs/
+*.log

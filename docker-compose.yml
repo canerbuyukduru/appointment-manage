@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: randevu_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-randevu}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-randevu_pass}
+      POSTGRES_DB: ${DB_NAME:-randevu_db}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-randevu}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: randevu_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend.Dockerfile
+      target: development
+    container_name: randevu_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-randevu}:${DB_PASSWORD:-randevu_pass}@postgres:5432/${DB_NAME:-randevu_db}
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: development
+    ports:
+      - '3001:3001'
+      - '5555:5555'  # Prisma Studio
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.Dockerfile
+      target: development
+    container_name: randevu_frontend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    command: npm run dev
+
+  nginx:
+    image: nginx:alpine
+    container_name: randevu_nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:
+  redis_data:

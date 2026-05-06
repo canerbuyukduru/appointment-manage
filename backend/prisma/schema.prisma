@@ -1,0 +1,461 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  admin
+  business_owner
+  staff
+  customer
+}
+
+enum UserStatus {
+  active
+  suspended
+  deleted
+}
+
+enum BusinessStatus {
+  pending
+  active
+  suspended
+  rejected
+}
+
+enum AppointmentStatus {
+  pending
+  confirmed
+  started
+  completed
+  cancelled_by_customer
+  cancelled_by_business
+  no_show
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
+  partially_refunded
+}
+
+enum PaymentMethod {
+  credit_card
+}
+
+enum NotificationType {
+  email
+  sms
+  push
+}
+
+enum NotificationChannel {
+  appointments
+  payments
+  reviews
+  promotions
+  system
+}
+
+enum LoyaltySource {
+  appointment
+  review
+  referral
+  bonus
+}
+
+enum LoyaltyTransactionType {
+  earned
+  spent
+  expired
+}
+
+enum CustomerTier {
+  bronze
+  silver
+  gold
+  platinum
+}
+
+enum FavoritableType {
+  business
+  staff
+}
+
+// ─── Modeller ────────────────────────────────────────────
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  passwordHash  String
+  role          Role       @default(customer)
+  firstName     String
+  lastName      String
+  phone         String?
+  avatar        String?
+  birthDate     DateTime?
+  gender        String?
+  status        UserStatus @default(active)
+  emailVerified Boolean    @default(false)
+  phoneVerified Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  businesses           Business[]
+  appointments         Appointment[]    @relation("CustomerAppointments")
+  cancelledAppointments Appointment[]   @relation("CancelledBy")
+  reviews              Review[]
+  favorites            Favorite[]
+  loyaltyPoints        LoyaltyPoint[]
+  loyaltyTransactions  LoyaltyTransaction[]
+  customerTier         CustomerTier_?
+  notifications        Notification[]
+  notificationPrefs    NotificationPreference[]
+  staffProfile         Staff?
+
+  @@index([email])
+  @@index([role, status])
+}
+
+model Business {
+  id            String         @id @default(cuid())
+  ownerId       String
+  name          String
+  slug          String         @unique
+  categoryId    String
+  description   String?
+  logo          String?
+  coverImage    String?
+  address       String?
+  city          String?
+  state         String?
+  country       String         @default("TR")
+  postalCode    String?
+  latitude      Float?
+  longitude     Float?
+  phone         String?
+  email         String?
+  website       String?
+  socialMedia   Json?
+  status        BusinessStatus @default(pending)
+  ratingAverage Float          @default(0)
+  ratingCount   Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  owner              User                 @relation(fields: [ownerId], references: [id])
+  category           Category             @relation(fields: [categoryId], references: [id])
+  staff              Staff[]
+  services           Service[]
+  appointments       Appointment[]
+  businessHours      BusinessHour[]
+  holidays           BusinessHoliday[]
+  reviews            Review[]
+  favorites          Favorite[]
+  cancellationPolicy CancellationPolicy?
+  payments           Payment[]
+
+  @@index([slug])
+  @@index([categoryId, status])
+  @@index([city, status])
+}
+
+model BusinessHour {
+  id          String   @id @default(cuid())
+  businessId  String
+  dayOfWeek   Int      // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
+  isOpen      Boolean  @default(true)
+  openTime    String   // "09:00"
+  closeTime   String   // "18:00"
+  breakStart  String?
+  breakEnd    String?
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model BusinessHoliday {
+  id          String   @id @default(cuid())
+  businessId  String
+  date        DateTime @db.Date
+  reason      String?
+  isFullDay   Boolean  @default(true)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model Staff {
+  id             String   @id @default(cuid())
+  businessId     String
+  userId         String?  @unique
+  name           String
+  email          String?
+  phone          String?
+  avatar         String?
+  specialization String?
+  bio            String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  business     Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user         User?             @relation(fields: [userId], references: [id])
+  workingHours StaffWorkingHour[]
+  services     ServiceStaff[]
+  appointments Appointment[]
+  favorites    Favorite[]
+
+  @@index([businessId, isActive])
+}
+
+model StaffWorkingHour {
+  id          String  @id @default(cuid())
+  staffId     String
+  dayOfWeek   Int
+  isAvailable Boolean @default(true)
+  startTime   String
+  endTime     String
+  breakStart  String?
+  breakEnd    String?
+
+  staff Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  icon        String?
+  description String?
+  parentId    String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+
+  parent     Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children   Category[] @relation("CategoryTree")
+  businesses Business[]
+  services   Service[]
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  businessId  String
+  categoryId  String?
+  name        String
+  description String?
+  duration    Int      // dakika
+  price       Decimal  @db.Decimal(10, 2)
+  image       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business     Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category     Category?      @relation(fields: [categoryId], references: [id])
+  staff        ServiceStaff[]
+  appointments Appointment[]
+}
+
+model ServiceStaff {
+  id        String @id @default(cuid())
+  serviceId String
+  staffId   String
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  staff   Staff   @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, staffId])
+}
+
+model Appointment {
+  id                 String            @id @default(cuid())
+  businessId         String
+  customerId         String
+  serviceId          String
+  staffId            String
+  appointmentDate    DateTime          @db.Date
+  startTime          String
+  endTime            String
+  status             AppointmentStatus @default(pending)
+  customerNotes      String?
+  businessNotes      String?
+  cancellationReason String?
+  cancelledAt        DateTime?
+  cancelledById      String?
+  totalPrice         Decimal           @db.Decimal(10, 2)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  business    Business  @relation(fields: [businessId], references: [id])
+  customer    User      @relation("CustomerAppointments", fields: [customerId], references: [id])
+  service     Service   @relation(fields: [serviceId], references: [id])
+  staff       Staff     @relation(fields: [staffId], references: [id])
+  cancelledBy User?     @relation("CancelledBy", fields: [cancelledById], references: [id])
+  payment     Payment?
+  review      Review?
+
+  @@index([staffId, appointmentDate, status])
+  @@index([businessId, appointmentDate])
+  @@index([customerId, status])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  appointmentId         String        @unique
+  customerId            String
+  businessId            String
+  amount                Decimal       @db.Decimal(10, 2)
+  commissionAmount      Decimal       @db.Decimal(10, 2)
+  netAmount             Decimal       @db.Decimal(10, 2)
+  paymentMethod         PaymentMethod @default(credit_card)
+  transactionId         String?
+  status                PaymentStatus @default(pending)
+  refundAmount          Decimal?      @db.Decimal(10, 2)
+  refundReason          String?
+  refundedAt            DateTime?
+  paymentGatewayResponse Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  business    Business    @relation(fields: [businessId], references: [id])
+}
+
+model Review {
+  id                   String   @id @default(cuid())
+  appointmentId        String   @unique
+  businessId           String
+  customerId           String
+  rating               Int
+  serviceQualityRating Int?
+  hygieneRating        Int?
+  staffRating          Int?
+  pricePerformanceRating Int?
+  atmosphereRating     Int?
+  comment              String?
+  photos               Json?
+  businessResponse     String?
+  businessRespondedAt  DateTime?
+  isVerified           Boolean  @default(true)
+  isVisible            Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  business    Business    @relation(fields: [businessId], references: [id])
+  customer    User        @relation(fields: [customerId], references: [id])
+
+  @@index([businessId, isVisible])
+}
+
+model Favorite {
+  id              String          @id @default(cuid())
+  customerId      String
+  favoritableType FavoritableType
+  businessId      String?
+  staffId         String?
+  createdAt       DateTime        @default(now())
+
+  customer User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  business Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  staff    Staff?    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, favoritableType, businessId, staffId])
+}
+
+model LoyaltyPoint {
+  id          String        @id @default(cuid())
+  customerId  String
+  points      Int
+  source      LoyaltySource
+  referenceId String?
+  description String?
+  expiresAt   DateTime?
+  createdAt   DateTime      @default(now())
+
+  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model LoyaltyTransaction {
+  id            String                 @id @default(cuid())
+  customerId    String
+  points        Int
+  type          LoyaltyTransactionType
+  referenceType String?
+  referenceId   String?
+  description   String?
+  createdAt     DateTime               @default(now())
+
+  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model CustomerTier_ {
+  id                String       @id @default(cuid())
+  customerId        String       @unique
+  tier              CustomerTier @default(bronze)
+  totalSpent        Decimal      @default(0) @db.Decimal(10, 2)
+  totalAppointments Int          @default(0)
+  tierSince         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_tiers")
+}
+
+model CancellationPolicy {
+  id                      String   @id @default(cuid())
+  businessId              String   @unique
+  hoursBeforeAppointment  Int      @default(24)
+  refundPercentage        Int      @default(100)
+  policyText              String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  channel   NotificationChannel
+  isRead    Boolean             @default(false)
+  sentAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}
+
+model NotificationPreference {
+  id        String              @id @default(cuid())
+  userId    String
+  channel   NotificationType
+  category  NotificationChannel
+  isEnabled Boolean             @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channel, category])
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt
+}
