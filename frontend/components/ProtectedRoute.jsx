@@ -10,39 +10,25 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Component yüklendiğinde kontrol et
-    console.log('ProtectedRoute kontrol:', { user, isAuthenticated })
-    
-    // Kısa bir süre bekle (Redux state'inin yüklenmesi için)
     const timer = setTimeout(() => {
-      // 1. Giriş yapmamış mı?
       if (!isAuthenticated || !user) {
-        console.log('Giriş yapmamış, login\'e yönlendiriliyor')
-        // Browser level redirect - kesin çözüm
         window.location.href = '/login'
         return
       }
 
-      // 2. Role kontrolü (eğer allowedRoles belirtilmişse)
       if (allowedRoles.length > 0 && (!user?.role || !allowedRoles.includes(user.role))) {
-        console.log('Yetkisiz erişim, dashboard\'a yönlendiriliyor')
         window.location.href = '/dashboard'
         return
       }
 
-      // 3. Her şey tamam, sayfayı göster
-      console.log('Erişim izni verildi')
       setIsLoading(false)
-    }, 100) // 100ms bekle
+    }, 100)
 
     return () => clearTimeout(timer)
   }, [isAuthenticated, user, router, allowedRoles])
 
-  // Auth state değişikliklerini dinle - anlık tepki
   useEffect(() => {
-    // Eğer kullanıcı logout olmuşsa hemen yönlendir
     if (isAuthenticated === false && user === null && !isLoading) {
-      console.log('Logout algılandı, yönlendiriliyor...')
       window.location.href = '/login'
     }
   }, [isAuthenticated, user, isLoading])

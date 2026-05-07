@@ -62,10 +62,6 @@ const appointmentSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    reminderSent: {
-      type: Boolean,
-      default: false, // Hatırlatma email'i gönderildi mi?
-    },
 
     emailsSent: {
       created: { type: Boolean, default: false },

@@ -12,8 +12,11 @@ import { logout, updateUser } from "@/lib/features/authSlice";
 import UserProfileModal from "@/components/UserProfileModal"; // Modal component'i import et
 
 import toast from "react-hot-toast";
-import { User, Building, Shield, LogOut, Edit3 } from "lucide-react";
+import { User, Building, Shield, Edit3 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import OwnerNavbar from "@/components/OwnerNavbar";
+import UserNavbar from "@/components/UserNavbar";
+import AdminNavbar from "@/components/AdminNavbar";
 import Link from "next/link";
 
 function DashboardContent() {
@@ -68,19 +71,12 @@ function DashboardContent() {
 
   // 🔓 Logout işlemi
   const handleLogout = async () => {
-    console.log("🔄 Logout başlatılıyor...");
     try {
-      const result = await logoutMutation().unwrap();
-      console.log("✅ Logout API başarılı:", result);
-
+      await logoutMutation().unwrap();
       dispatch(logout());
-      console.log("✅ Redux state temizlendi");
-
       toast.success("Başarıyla çıkış yapıldı");
       router.push("/login");
     } catch (error) {
-      console.error("❌ Logout hatası:", error);
-      console.error("❌ Error details:", error.data);
       toast.error(
         "Çıkış yapılamadı: " + (error.data?.message || error.message)
       );
@@ -120,22 +116,13 @@ function DashboardContent() {
   };
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <button
-              onClick={handleLogout}
-              disabled={isLoading}
-              className="cursor-pointer flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-            >
-              <LogOut size={18} />
-              {isLoading ? "Çıkış yapılıyor..." : "Çıkış Yap"}
-            </button>
-          </div>
-        </div>
-      </div>
+      {user?.role === "owner" ? (
+        <OwnerNavbar />
+      ) : user?.role === "admin" ? (
+        <AdminNavbar />
+      ) : (
+        <UserNavbar />
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Card */}

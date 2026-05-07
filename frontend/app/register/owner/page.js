@@ -46,7 +46,6 @@ export default function OwnerRegisterPage() {
       // Login sayfasına yönlendir
       router.push('/login')
     } catch (error) {
-      console.error('Register error:', error)
       toast.error(error.data?.message || 'Kayıt başarısız')
     }
   }

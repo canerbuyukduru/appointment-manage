@@ -5,6 +5,7 @@ import BeautyCenter from "../models/beautyCentersModel.js";
 import Appointment from "../models/appoitmentsModel.js";
 import generateToken from "../utils/createToken.js";
 import bcrypt from "bcryptjs";
+import emailService from "../services/emailService.js";
 
 // @desc    Get admin dashboard statistics
 // @route   GET /api/admin/stats
@@ -277,29 +278,28 @@ export const approveOwner = asyncHandler(async (req, res) => {
   }
 
   if (owner.isApproved) {
-    const beautyCenter = await BeautyCenter.findOne({ ownerId: id });
-    if (beautyCenter) {
-      beautyCenter.isApproved = true;
-      await beautyCenter.save();
-    } else {
-      res.status(400);
-      throw new Error("İşletme Sahibi zaten onaylanmış.");
-    }
+    res.status(400);
+    throw new Error("İşletme Sahibi zaten onaylanmış.");
   }
 
-  // Owner'ı onayla
   owner.isApproved = true;
   await owner.save();
 
-  // Beauty center'ı da onayla (eğer varsa)
   const beautyCenter = await BeautyCenter.findOne({ ownerId: id });
   if (beautyCenter) {
     beautyCenter.isApproved = true;
     await beautyCenter.save();
   }
 
-  // TODO: Owner'a email bildirimi gönder
-  // await sendOwnerApprovalEmail(owner.email, { approved: true, notes });
+  try {
+    await emailService.sendOwnerApprovalNotification(owner.email, {
+      ownerName: owner.fullName,
+      centerName: beautyCenter?.name,
+      approved: true,
+    });
+  } catch (emailError) {
+    console.error("📧 Owner approval email failed:", emailError);
+  }
 
   res.json({
     success: true,
@@ -349,8 +349,15 @@ export const rejectOwner = asyncHandler(async (req, res) => {
     await beautyCenter.save();
   }
 
-  // TODO: Owner'a email bildirimi gönder
-  // await sendOwnerApprovalEmail(owner.email, { approved: false, reason });
+  try {
+    await emailService.sendOwnerApprovalNotification(owner.email, {
+      ownerName: owner.fullName,
+      approved: false,
+      reason,
+    });
+  } catch (emailError) {
+    console.error("📧 Owner rejection email failed:", emailError);
+  }
 
   res.json({
     success: true,

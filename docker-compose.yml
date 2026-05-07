@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-C.nemesis123}
+      MONGO_INITDB_ROOT_PASSWORD: C.nemesis123
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -16,8 +16,11 @@ services:
     env_file:
       - ./backend/.env
     environment:
+      # Production overrides — .env dosyasındaki değerlerin üzerine yazar
+      - NODE_ENV=production
       - PORT=5000
-      - FRONTEND_URL=http://frontend:3000
+      - MONGO_URI=mongodb://admin:C.nemesis123@mongodb:27017/appointment-manage-system?authSource=admin
+      - FRONTEND_URL=http://145.223.81.130:3000
     ports:
       - "5000:5000"
     depends_on:
@@ -32,11 +35,10 @@ services:
       args:
         - NEXT_PUBLIC_API_URL=http://145.223.81.130:5000/api
     ports:
-      - "3000:3000"   # hostPort:containerPort — hostta 3000 meşgulse "3001:3000" kullan
+      - "3000:3000"
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://145.223.81.130:5000/api
       - NODE_ENV=production
     networks:
       - appnet

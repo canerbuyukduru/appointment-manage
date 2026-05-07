@@ -45,7 +45,6 @@ export default function UserRegisterPage() {
       toast.success('Kayıt başarılı! Şimdi giriş yapabilirsiniz.')
       router.push('/login')
     } catch (error) {
-      console.error('Register error:', error)
       toast.error(error.data?.message || 'Kayıt işlemi başarısız')
     }
   }
@@ -146,9 +145,13 @@ export default function UserRegisterPage() {
               <input
                 {...register('password', {
                   required: 'Şifre zorunludur',
-                  minLength: {
-                    value: 6,
-                    message: 'Şifre en az 6 karakter olmalıdır'
+                  validate: (value) => {
+                    if (value.length < 8) return 'Şifre en az 8 karakter olmalıdır'
+                    if (!/[A-Z]/.test(value)) return 'En az bir büyük harf içermeli'
+                    if (!/[a-z]/.test(value)) return 'En az bir küçük harf içermeli'
+                    if (!/[0-9]/.test(value)) return 'En az bir rakam içermeli'
+                    if (!/[^A-Za-z0-9]/.test(value)) return 'En az bir özel karakter içermeli'
+                    return true
                   }
                 })}
                 type={showPassword ? 'text' : 'password'}

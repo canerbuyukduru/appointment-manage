@@ -97,7 +97,6 @@ export default function CreateAppointmentPage() {
 
     try {
       const startDateTime = new Date(`${formData.date}T${formData.time}:00`)
-      console.log(formData.customerFullName)
       await createAppointmentForCustomer({
         customerFullName: formData.customerFullName,
         customerEmail: formData.customerEmail,

@@ -153,8 +153,6 @@ function BookingProcess() {
         // serviceSnapshot backend'de otomatik oluşturulur
       }
 
-      console.log('Appointment data:', appointmentData) // Debug için
-
       await createAppointment(appointmentData).unwrap()
       toast.success('Randevunuz başarıyla oluşturuldu! Onay bekleniyor.')
       router.push('/user/appointments') // Randevularım sayfasına git

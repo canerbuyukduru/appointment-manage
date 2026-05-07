@@ -17,7 +17,7 @@ const UserProfileModal = ({ isOpen, onClose, currentUser, onUpdate, isUpdating }
   });
 
   const [errors, setErrors] = useState({});
-  console.log("currentUser", currentUser);
+
   // Modal açıldığında kullanıcı bilgilerini form'a doldur
   useEffect(() => {
     if (isOpen && currentUser) {

@@ -71,8 +71,8 @@ export const adminApi = createApi({
     rejectOwner: builder.mutation({
       query: ({ id, notes }) => ({
         url: `/owners/${id}/reject`,
-        method: 'PATCH', 
-        body: { notes },
+        method: 'PATCH',
+        body: { reason: notes },
       }),
       invalidatesTags: ['PendingOwners', 'AllOwners', 'AdminStats'],
     }),

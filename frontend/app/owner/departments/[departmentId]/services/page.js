@@ -12,9 +12,8 @@ import {
   useDeleteServiceMutation,
 } from '@/lib/services/serviceApi'
 import { useGetDepartmentsQuery } from '@/lib/services/departmentApi'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { 
-  Settings, 
+import {
+  Settings,
   Plus, 
   Edit2, 
   Trash2, 
@@ -388,9 +387,5 @@ function ServicesManager() {
 }
 
 export default function ServicesPage() {
-  return (
-    <ProtectedRoute allowedRoles={['owner']}>
-      <ServicesManager />
-    </ProtectedRoute>
-  )
+  return <ServicesManager />
 }

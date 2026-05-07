@@ -54,9 +54,9 @@ export const authApi = createApi({
 
     // Get Current User
     getCurrentUser: builder.query({
-      query: () => '/users/me',
-      providesTags: ['User'],
-    }),
+  query: () => '/users/profile',
+  providesTags: ['User'],
+}),
 
     // Update User Profile
     updateUserProfile: builder.mutation({

@@ -4,19 +4,15 @@ import { useState } from 'react'
 import { useGetMyBeautyCenterQuery } from '@/lib/services/beautyCenterApi'
 import { useGetDepartmentsQuery } from '@/lib/services/departmentApi'
 import { useGetOwnerAppointmentsQuery } from '@/lib/services/appointmentApi'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { 
-  Building, 
-  Calendar, 
-  Users, 
+import {
+  Building,
+  Calendar,
+  Users,
   TrendingUp,
   Clock,
   CheckCircle,
-  AlertTriangle,
   Plus,
   Settings,
-  BarChart3,
-  Eye,
   ArrowRight
 } from 'lucide-react'
 import Link from 'next/link'
@@ -106,41 +102,27 @@ function OwnerDashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Owner Dashboard</h1>
-                <p className="text-gray-600 mt-2">
-                  {beautyCenter.name} - Genel bakış ve istatistikler
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                {!beautyCenter.isApproved && (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg">
-                    <AlertTriangle size={16} />
-                    <span className="text-sm font-medium">Onay Bekleniyor</span>
-                  </div>
-                )}
-                
-                <Link 
-                  href="/owner/beauty-center"
-                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Settings size={16} />
-                  Ayarlar
-                </Link>
-              </div>
+    <div>
+      {/* Page Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-500 mt-1">{beautyCenter.name}</p>
             </div>
+            <Link
+              href="/owner/beauty-center"
+              className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600"
+            >
+              <Settings size={15} />
+              İşletme Ayarları
+            </Link>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Bugünkü Randevular */}
@@ -344,9 +326,5 @@ function OwnerDashboardContent() {
 }
 
 export default function OwnerDashboardPage() {
-  return (
-    <ProtectedRoute allowedRoles={['owner']}>
-      <OwnerDashboardContent />
-    </ProtectedRoute>
-  )
+  return <OwnerDashboardContent />
 }

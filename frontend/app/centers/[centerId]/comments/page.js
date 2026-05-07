@@ -41,7 +41,6 @@ export default function CenterDetailPage() {
       toast.error(error?.data?.message || 'Yorum eklenirken hata oluştu');
     }
   };
-  console.log(commentsData.comments)
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

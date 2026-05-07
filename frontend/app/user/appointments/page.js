@@ -8,7 +8,6 @@ import {
   useGetMyAppointmentsQuery, 
   useCancelAppointmentMutation 
 } from '@/lib/services/appointmentApi'
-import ProtectedRoute from '@/components/ProtectedRoute'
 import { 
   ArrowLeft, 
   Calendar, 
@@ -389,9 +388,5 @@ function AppointmentsManager() {
 }
 
 export default function AppointmentsPage() {
-  return (
-    <ProtectedRoute allowedRoles={['user']}>
-      <AppointmentsManager />
-    </ProtectedRoute>
-  )
+  return <AppointmentsManager />
 }

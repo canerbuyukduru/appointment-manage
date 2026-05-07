@@ -64,7 +64,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     _id: user._id,
-    full_name: user.full_name,
+    fullName: user.fullName,
     email: user.email,
     phone: user.phone,
     role: user.role,

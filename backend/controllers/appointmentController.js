@@ -3,6 +3,8 @@ import Appointment from "../models/appoitmentsModel.js";
 import BeautyCenter from "../models/beautyCentersModel.js";
 import Department from "../models/departmentModel.js";
 import Service from "../models/servicesModel.js";
+import User from "../models/userModel.js";
+import emailService from "../services/emailService.js";
 
 
 
@@ -24,7 +26,6 @@ export const createAppointment = asyncHandler(async (req, res) => {
 
   // temel veriler
   const center = await BeautyCenter.findById(beautyCenterId);
-  console.log(center.isApproved)
   if (!center || !center.isApproved) {
     res.status(400);
     throw new Error("Merkez bulunamadı veya henüz onaylı değil.");
@@ -112,6 +113,22 @@ export const createAppointment = asyncHandler(async (req, res) => {
       price: service.price
     }
   });
+
+  // Owner'a yeni randevu email bildirimi
+  try {
+    const owner = await User.findById(center.ownerId).select("email fullName");
+    if (owner?.email) {
+      await emailService.sendNewAppointmentNotification(owner.email, {
+        ownerName: owner.fullName,
+        centerName: center.name,
+        customerName: req.user.fullName,
+        serviceName: service.name,
+        startDateTime: start,
+      });
+    }
+  } catch (emailError) {
+    console.error("📧 Owner notification email failed:", emailError);
+  }
 
   res.status(201).json({
     message: "Randevunuz oluşturuldu, onay bekleniyor.",

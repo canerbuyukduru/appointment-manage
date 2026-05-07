@@ -5,9 +5,8 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useGetDepartmentsQuery,useCreateDepartmentMutation,useUpdateDepartmentMutation,useDeleteDepartmentMutation} from '@/lib/services/departmentApi'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { 
-  Folder, 
+import {
+  Folder,
   Plus, 
   Edit2, 
   Trash2, 
@@ -293,9 +292,5 @@ function DepartmentsManager() {
 }
 
 export default function DepartmentsPage() {
-  return (
-    <ProtectedRoute allowedRoles={['owner']}>
-      <DepartmentsManager />
-    </ProtectedRoute>
-  )
+  return <DepartmentsManager />
 }

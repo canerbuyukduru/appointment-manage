@@ -1,5 +1,7 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config(); // .env en önce yüklenmeli
+
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -19,7 +21,6 @@ import availabilityRoutes from "./routes/availabilityRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 
 import { authenticate, authorizeAdmin } from "./middleware/authMiddleware.js";
-dotenv.config();
 
 const app = express();
 

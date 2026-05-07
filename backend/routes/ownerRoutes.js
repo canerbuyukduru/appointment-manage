@@ -1,7 +1,6 @@
 import express from "express";
 import { registerOwner, loginOwner, logoutOwner, getOwnerAppointments,updateAppointmentStatus, ownerApproveAppointment, ownerRejectAppointment, ownerMarkAttendance, updateOwnerProfile, getOwnerProfile, createAppointmentForCustomer } from "../controllers/ownerController.js";
 import { authenticate, authorizeOwner} from "../middleware/authMiddleware.js";
-import {  } from '../controllers/appointmentController.js'
 
 const router = express.Router();
 

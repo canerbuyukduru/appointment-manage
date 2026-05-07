@@ -3,7 +3,6 @@
 import {
   useGetAdminStatsQuery,
   useGetPendingOwnersQuery,
-  useLogoutAdminMutation,
 } from "@/lib/services/adminApi";
 import { useGetCurrentUserQuery } from "@/lib/services/authApi";
 import { useRouter } from "next/navigation";
@@ -12,19 +11,13 @@ import {
   Users,
   Building2,
   Calendar,
-  AlertTriangle,
-  TrendingUp,
   Clock,
   CheckCircle,
-  XCircle,
-  Shield,
-  LogOut,
   Eye,
   UserCheck,
   Settings,
 } from "lucide-react";
 import Link from "next/link";
-import toast from "react-hot-toast";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -33,24 +26,11 @@ export default function AdminDashboard() {
   const { data: stats, isLoading: statsLoading } = useGetAdminStatsQuery();
   const { data: pendingOwners, isLoading: ownersLoading } =
     useGetPendingOwnersQuery();
-  const [logout] = useLogoutAdminMutation();
-
-  // Admin kontrolü
   useEffect(() => {
     if (!userLoading && (!currentUser || currentUser.role !== "admin")) {
       router.push("/admin/login");
     }
   }, [currentUser, userLoading, router]);
-
-  const handleLogout = async () => {
-    try {
-      await logout().unwrap();
-      toast.success("Çıkış yapıldı");
-      router.push("/admin/login");
-    } catch (error) {
-      toast.error("Çıkış yapılırken hata oluştu");
-    }
-  };
 
   if (userLoading || statsLoading) {
     return (
@@ -70,37 +50,7 @@ export default function AdminDashboard() {
   const statsData = stats?.stats || {};
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Shield className="text-red-600" size={28} />
-                <h1 className="text-xl font-bold text-gray-900">
-                  Admin Paneli
-                </h1>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
-                Hoş geldiniz,{" "}
-                <span className="font-medium">{currentUser.fullName}</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="cursor-pointer flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <LogOut size={18} />
-                Çıkış
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -207,7 +157,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex gap-2">
                       <Link
-                        href={`/admin/owners/${owner._id}`}
+                        href="/admin/owners"
                         className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <Eye size={16} />

@@ -1,11 +1,6 @@
 import mongoose from "mongoose"
 
 const commentSchema = new mongoose.Schema({
-    comment:{
-        type:String,
-        required:true,
-        
-    },
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
@@ -28,6 +23,10 @@ const commentSchema = new mongoose.Schema({
     trim:true,
     minLength:10,
     maxLength:300
+   },
+   ownerReply:{
+    text:{ type:String, trim:true, maxLength:500 },
+    repliedAt:{ type:Date }
    }
 },{timestamps:true})
 

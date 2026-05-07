@@ -1,17 +1,66 @@
 // app/page.jsx
 'use client'
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useState, useRef, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { useGetAllBeautyCentersQuery } from '@/lib/services/beautyCenterApi'
-import { Search, MapPin, Phone, Clock, Star } from 'lucide-react'
+import { useLogoutMutation } from '@/lib/services/authApi'
+import { logout } from '@/lib/features/authSlice'
+import { Search, MapPin, Phone, Clock, Star, ChevronDown, LogOut, User, LayoutDashboard, Calendar, Building, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 
 export default function HomePage() {
   const { user, isAuthenticated } = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [locationFilter, setLocationFilter] = useState('')
+  const [profileOpen, setProfileOpen] = useState(false)
+  const dropdownRef = useRef(null)
+  const [logoutMutation] = useLogoutMutation()
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setProfileOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation().unwrap()
+    } finally {
+      dispatch(logout())
+      toast.success('Çıkış yapıldı')
+      router.push('/login')
+    }
+  }
+
+  const initials = user?.fullName
+    ? user.fullName.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+    : 'U'
+
+  const getDashboardLink = () => {
+    if (user?.role === 'owner') return '/owner/dashboard'
+    if (user?.role === 'admin') return '/admin/dashboard'
+    return '/dashboard'
+  }
+
+  const getRoleLabel = () => {
+    if (user?.role === 'owner') return 'İşletme Sahibi'
+    if (user?.role === 'admin') return 'Admin'
+    return 'Kullanıcı'
+  }
+
+  const getAvatarGradient = () => {
+    if (user?.role === 'owner') return 'from-purple-500 to-indigo-600'
+    if (user?.role === 'admin') return 'from-red-500 to-rose-600'
+    return 'from-pink-500 to-purple-600'
+  }
 
   // API call - Herkes için (giriş yapmadan da çalışır)
   const { 
@@ -90,14 +139,86 @@ export default function HomePage() {
             
             <div className="flex items-center gap-4">
               {isAuthenticated ? (
-                <div className="flex items-center gap-4">
-                  <span className="text-gray-700">Merhaba, {user?.fullName}</span>
-                  <Link
-                    href="/dashboard"
-                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setProfileOpen((v) => !v)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    Dashboard
-                  </Link>
+                    <div className={`w-8 h-8 bg-gradient-to-r ${getAvatarGradient()} rounded-full flex items-center justify-center text-white text-xs font-bold`}>
+                      {initials}
+                    </div>
+                    <div className="hidden sm:block text-left">
+                      <p className="text-sm font-medium text-gray-900 leading-none">{user?.fullName}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{getRoleLabel()}</p>
+                    </div>
+                    <ChevronDown size={16} className={`text-gray-400 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {profileOpen && (
+                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900">{user?.fullName}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">{user?.email}</p>
+                      </div>
+                      <div className="py-1">
+                        <Link
+                          href={getDashboardLink()}
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          <LayoutDashboard size={16} className="text-gray-400" />
+                          Dashboard
+                        </Link>
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          <User size={16} className="text-gray-400" />
+                          Profilim
+                        </Link>
+                        {user?.role === 'user' && (
+                          <Link
+                            href="/user/appointments"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <Calendar size={16} className="text-gray-400" />
+                            Randevularım
+                          </Link>
+                        )}
+                        {user?.role === 'owner' && (
+                          <Link
+                            href="/owner/beauty-center"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <Building size={16} className="text-gray-400" />
+                            İşletmem
+                          </Link>
+                        )}
+                        {user?.role === 'admin' && (
+                          <Link
+                            href="/admin/owners"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <ShieldCheck size={16} className="text-gray-400" />
+                            Onay Bekleyenler
+                          </Link>
+                        )}
+                      </div>
+                      <div className="border-t border-gray-100 py-1">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <LogOut size={16} />
+                          Çıkış Yap
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex gap-2">

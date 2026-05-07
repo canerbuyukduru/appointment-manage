@@ -4,25 +4,21 @@ import nodemailer from 'nodemailer';
 
 class EmailService {
   constructor() {
-    // Gmail SMTP kullanarak transporter oluştur
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER, // Gmail adresiniz
-        pass: process.env.EMAIL_PASS, // Gmail App Password
-      }
-    });
+    this._transporter = null;
+  }
 
-    // Alternatif: SendGrid kullanmak isterseniz
-    // this.transporter = nodemailer.createTransporter({
-    //   host: 'smtp.sendgrid.net',
-    //   port: 587,
-    //   secure: false,
-    //   auth: {
-    //     user: 'apikey',
-    //     pass: process.env.SENDGRID_API_KEY
-    //   }
-    // });
+  // Transporter lazy olarak ilk kullanımda oluşturulur (dotenv yüklendikten sonra)
+  get transporter() {
+    if (!this._transporter) {
+      this._transporter = nodemailer.createTransport({
+        service: process.env.EMAIL_SERVICE || 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+    }
+    return this._transporter;
   }
 
   // Genel email gönderme fonksiyonu
@@ -392,6 +388,106 @@ class EmailService {
     `;
 
     await this.sendEmail(to, 'Yarın Randevunuz Var! ⏰', html);
+  }
+
+  // Owner onay/red bildirimi
+  async sendOwnerApprovalNotification(to, data) {
+    const { ownerName, centerName, approved, reason } = data;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .header { background: ${approved ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'}; color: white; padding: 30px; text-align: center; }
+          .content { padding: 30px; }
+          .card { background: ${approved ? '#ecfdf5' : '#fef2f2'}; border-left: 4px solid ${approved ? '#10b981' : '#ef4444'}; padding: 20px; margin: 20px 0; border-radius: 5px; }
+          .button { display: inline-block; background: ${approved ? '#10b981' : '#ef4444'}; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; }
+          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>${approved ? '✅ Başvurunuz Onaylandı!' : '❌ Başvurunuz Reddedildi'}</h1>
+          </div>
+          <div class="content">
+            <p>Merhaba <strong>${ownerName}</strong>,</p>
+            ${approved
+              ? `<p><strong>${centerName || 'İşletmeniz'}</strong> için yaptığınız başvuru onaylandı. Artık sisteme giriş yaparak işletmenizi yönetebilirsiniz.</p>`
+              : `<p>Üzgünüz, başvurunuz reddedildi.</p>`
+            }
+            ${reason ? `<div class="card"><p><strong>Sebep:</strong> ${reason}</p></div>` : ''}
+            ${approved ? `<a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/owner/dashboard" class="button">Panele Git</a>` : ''}
+          </div>
+          <div class="footer">
+            <p>Bu otomatik bir emaildir, lütfen yanıtlamayın.</p>
+            <p>BeautyCenter App © 2025</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const subject = approved ? 'Başvurunuz Onaylandı! ✅' : 'Başvurunuz Reddedildi';
+    await this.sendEmail(to, subject, html);
+  }
+
+  // Owner'a yeni randevu bildirimi
+  async sendNewAppointmentNotification(to, data) {
+    const { ownerName, centerName, customerName, serviceName, startDateTime } = data;
+
+    const formattedDate = new Date(startDateTime).toLocaleDateString('tr-TR', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    const formattedTime = new Date(startDateTime).toLocaleTimeString('tr-TR', {
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+          .content { padding: 30px; }
+          .card { background: #f8f9ff; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 5px; }
+          .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; }
+          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔔 Yeni Randevu Talebi!</h1>
+          </div>
+          <div class="content">
+            <p>Merhaba <strong>${ownerName}</strong>,</p>
+            <p><strong>${centerName}</strong> için yeni bir randevu talebi geldi.</p>
+            <div class="card">
+              <p><strong>Müşteri:</strong> ${customerName}</p>
+              <p><strong>Hizmet:</strong> ${serviceName}</p>
+              <p><strong>Tarih:</strong> ${formattedDate}</p>
+              <p><strong>Saat:</strong> ${formattedTime}</p>
+            </div>
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/owner/appointments" class="button">Randevuları Yönet</a>
+          </div>
+          <div class="footer">
+            <p>Bu otomatik bir emaildir, lütfen yanıtlamayın.</p>
+            <p>BeautyCenter App © 2025</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await this.sendEmail(to, `Yeni Randevu Talebi - ${customerName} 🔔`, html);
   }
 }
 

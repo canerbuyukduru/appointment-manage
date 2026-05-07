@@ -8,7 +8,7 @@ import {
   useGetMyBeautyCenterQuery,
   useUpdateMyBeautyCenterMutation 
 } from '@/lib/services/beautyCenterApi'
-import ProtectedRoute from '@/components/ProtectedRoute'
+
 import { Building, MapPin, Phone, Mail, Clock, Calendar, ArrowLeft, Save, AlertTriangle, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
@@ -62,8 +62,6 @@ function BeautyCenterManager() {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Form data:', data)
-      
       if (isEditing) {
         const result = await updateCenter(data).unwrap()
         toast.success('İşletme bilgileri güncellendi!')
@@ -386,9 +384,5 @@ function BeautyCenterManager() {
 }
 
 export default function BeautyCenterPage() {
-  return (
-    <ProtectedRoute allowedRoles={['owner']}>
-      <BeautyCenterManager />
-    </ProtectedRoute>
-  )
+  return <BeautyCenterManager />
 }

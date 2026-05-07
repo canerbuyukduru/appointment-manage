@@ -64,7 +64,7 @@ export const loginOwner = async (req, res) => {
     res.status(200).json({
       message: "Login başarılı",
       owner: {
-        id: owner._id,
+        _id: owner._id,
         fullName: owner.fullName,
         email: owner.email,
         phone: owner.phone,
@@ -411,7 +411,12 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
 
-  // Owner'ın bu randevuyu güncelleyebilir mi kontrol et
+  const validStatuses = ["approved", "rejected", "cancelled", "completed", "no-show"];
+  if (!validStatuses.includes(status)) {
+    res.status(400);
+    throw new Error("Geçersiz durum değeri");
+  }
+
   const center = await BeautyCenter.findOne({ ownerId: req.user._id });
   if (!center) {
     res.status(404);
@@ -421,7 +426,7 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
   const appointment = await Appointment.findOne({
     _id: id,
     beautyCenterId: center._id,
-  });
+  }).populate("userId", "fullName email phone");
 
   if (!appointment) {
     res.status(404);
@@ -429,11 +434,35 @@ export const updateAppointmentStatus = asyncHandler(async (req, res) => {
   }
 
   appointment.status = status;
-  if (notes) {
-    appointment.notes = notes; // Eğer appointment modelinizde notes field'ı varsa
-  }
-
+  if (notes) appointment.notes = notes;
   await appointment.save();
+
+  // Email bildirimi
+  try {
+    const customerEmail = appointment.userId?.email;
+    if (customerEmail) {
+      if (status === "approved") {
+        await emailService.sendAppointmentApproved(customerEmail, {
+          customerName: appointment.userId.fullName,
+          centerName: center.name,
+          serviceName: appointment.serviceSnapshot?.name,
+          startDateTime: appointment.startDateTime,
+          centerPhone: center.phone,
+          centerAddress: center.address,
+        });
+      } else if (status === "rejected") {
+        await emailService.sendAppointmentRejected(customerEmail, {
+          customerName: appointment.userId.fullName,
+          centerName: center.name,
+          serviceName: appointment.serviceSnapshot?.name,
+          startDateTime: appointment.startDateTime,
+          rejectionReason: notes,
+        });
+      }
+    }
+  } catch (emailError) {
+    console.error("📧 Status update email failed:", emailError);
+  }
 
   res.json({
     success: true,
@@ -499,11 +528,12 @@ export const createAppointmentForCustomer = asyncHandler(async (req, res) => {
   // Müşteri yoksa yeni hesap oluştur
   if (!customer) {
     tempPassword = Math.random().toString(36).slice(-8) + '!';
+    const hashedTempPassword = await bcrypt.hash(tempPassword, 10);
     customer = await User.create({
       fullName: customerFullName || "Müşteri",
       email: customerEmail || `customer_${Date.now()}@temp.com`,
       phone: customerPhone || "",
-      password: tempPassword,
+      password: hashedTempPassword,
       role: "user"
     });
     

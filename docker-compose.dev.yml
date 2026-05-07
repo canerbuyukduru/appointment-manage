@@ -1,0 +1,17 @@
+# Local development için sadece MongoDB çalıştırır
+# Kullanım: docker-compose -f docker-compose.dev.yml up -d
+#
+# Backend: cd backend && npm run dev
+# Frontend: cd frontend && npm run dev
+
+services:
+  mongodb:
+    image: mongo:6.0
+    restart: unless-stopped
+    ports:
+      - "27017:27017"   # host:container — localhost:27017'den erişilebilir
+    volumes:
+      - mongodb_dev_data:/data/db
+
+volumes:
+  mongodb_dev_data:
