@@ -15,19 +15,13 @@ services:
       context: ./backend
     env_file:
       - ./backend/.env
-    environment:
-      # Production overrides — .env dosyasındaki değerlerin üzerine yazar
-      - NODE_ENV=production
-      - PORT=5000
-      - MONGO_URI=mongodb://admin:C.nemesis123@mongodb:27017/appointment-manage-system?authSource=admin
-      - FRONTEND_URL=http://145.223.81.130:3000
     ports:
       - "5000:5000"
     depends_on:
       - mongodb
     networks:
       - appnet
-    restart: unless-stopped
+    restart: on-failure
 
   frontend:
     build:
