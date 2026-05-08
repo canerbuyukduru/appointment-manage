@@ -16,6 +16,7 @@ Güzellik merkezi randevu yönetim sistemi. Üç rol: müşteriler randevu alır
 | Mayıs 2026 | `8d26e72` | MONGO_URI docker-compose'dan kaldırıldı, env_file kullanılıyor |
 | Mayıs 2026 | `53f6e40` | Güvenlik düzeltmeleri + auth/register sayfaları koyu tema |
 | Mayıs 2026 | `b246761` | Tüm iç sayfalar ve navbar bileşenleri koyu tema |
+| Mayıs 2026 | *(güncel)* | Merkezi hata mesajları: 429, ağ hatası, sunucu hatası Türkçe bildirim |
 
 ### Aktif Güvenlik Açıkları (Kritik → Düşük)
 
@@ -276,6 +277,35 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 
 ---
 
+## HATA YÖNETİMİ (Mayıs 2026)
+
+Tüm frontend sayfalarında merkezi hata mesajı yönetimi uygulandı.
+
+### Dosya
+
+`frontend/lib/utils/errorMessages.js` — iki export:
+- `getErrorMessage(error, fallback)` — HTTP durum koduna göre Türkçe mesaj döner
+- `getToastDuration(error)` — 429 hataları için 8 sn, diğerleri için 5 sn
+
+### Durum Kodu → Mesaj Tablosu
+
+| Durum | Kullanıcı Mesajı |
+|---|---|
+| `FETCH_ERROR` | Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin. |
+| `429` | Çok fazla istek gönderildi. Lütfen birkaç dakika bekleyip tekrar deneyin. |
+| `401` | Oturum süreniz dolmuş. Lütfen tekrar giriş yapın. |
+| `403` | Bu işlem için yetkiniz bulunmuyor. |
+| `404` | Aradığınız kaynak bulunamadı. |
+| `409` | Bu bilgiler zaten sistemde kayıtlı. *(veya sunucu mesajı)* |
+| `422` | Girilen bilgiler geçersiz. *(veya sunucu mesajı)* |
+| `5xx` | Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin. |
+
+### Kapsanan Sayfalar
+
+Login, Register (user/owner), Admin Login, Booking, Kullanıcı Randevuları, Owner Appointments/BeautyCenter/Departments/Services, Admin Users/Owners/Centers, Dashboard
+
+---
+
 ## SONRAKI SPRINT ÖNERİSİ
 
 1. **HTTPS** — Nginx + Let's Encrypt (Certbot) kurulumu → `secure: true` cookie'yi aktif et
@@ -337,4 +367,4 @@ PATCH  /api/admin/beauty-centers/:id/toggle-status
 
 ---
 
-*Son güncelleme: Mayıs 2026 — commit b246761*
+*Son güncelleme: Mayıs 2026 — hata yönetimi refactor*

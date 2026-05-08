@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 export default function AdminCentersPage() {
   const router = useRouter()
@@ -61,7 +62,7 @@ export default function AdminCentersPage() {
       setShowModal(false)
       refetch()
     } catch (error) {
-      toast.error(error.data?.message || 'İşlem başarısız')
+      toast.error(getErrorMessage(error, 'İşlem başarısız'), { duration: getToastDuration(error) })
     }
   }
 

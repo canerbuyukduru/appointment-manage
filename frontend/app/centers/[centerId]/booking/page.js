@@ -19,6 +19,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 function BookingProcess() {
   const params = useParams()
@@ -142,8 +143,7 @@ function BookingProcess() {
       toast.success('Randevunuz başarıyla oluşturuldu! Onay bekleniyor.')
       router.push('/user/appointments')
     } catch (error) {
-      console.error('Appointment error:', error)
-      toast.error(error.data?.message || 'Randevu oluşturulamadı')
+      toast.error(getErrorMessage(error, 'Randevu oluşturulamadı'), { duration: getToastDuration(error) })
     }
   }
 

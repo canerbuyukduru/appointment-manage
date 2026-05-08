@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import EmailStatusBadge from "@/components/EmailStatusBadge";
+import { getErrorMessage, getToastDuration } from "@/lib/utils/errorMessages";
 
 export default function OwnerAppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -108,7 +109,7 @@ export default function OwnerAppointmentsPage() {
       setActionNotes("");
       refetch();
     } catch (error) {
-      toast.error(error.data?.message || "İşlem başarısız");
+      toast.error(getErrorMessage(error, "İşlem başarısız"), { duration: getToastDuration(error) });
     }
   };
 
@@ -117,8 +118,8 @@ export default function OwnerAppointmentsPage() {
       await updateAppointmentStatus({ id: appointmentId, status }).unwrap();
       toast.success(status === "completed" ? "Randevu tamamlandı" : "Müşteri gelmedi olarak işaretlendi");
       refetch();
-    } catch {
-      toast.error("İşlem başarısız");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "İşlem başarısız"), { duration: getToastDuration(error) });
     }
   };
 

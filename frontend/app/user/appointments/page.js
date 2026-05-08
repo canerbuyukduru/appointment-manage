@@ -22,6 +22,7 @@ import {
   Filter
 } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 function AppointmentsManager() {
   const router = useRouter()
@@ -129,7 +130,7 @@ function AppointmentsManager() {
       setAppointmentToCancel(null)
       refetch()
     } catch (error) {
-      toast.error(error.data?.message || 'İptal işlemi başarısız')
+      toast.error(getErrorMessage(error, 'İptal işlemi başarısız'), { duration: getToastDuration(error) })
     }
   }
 

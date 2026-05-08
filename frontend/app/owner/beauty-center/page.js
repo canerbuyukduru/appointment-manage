@@ -11,6 +11,7 @@ import {
 
 import { Building, MapPin, Phone, Mail, Clock, Calendar, ArrowLeft, Save, AlertTriangle, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 function BeautyCenterManager() {
   const [isEditing, setIsEditing] = useState(false)
@@ -69,8 +70,7 @@ function BeautyCenterManager() {
         setIsEditing(true)
       }
     } catch (error) {
-      console.error('Error:', error)
-      toast.error(error.data?.message || 'İşlem başarısız')
+      toast.error(getErrorMessage(error, 'İşlem başarısız'), { duration: getToastDuration(error) })
     }
   }
 

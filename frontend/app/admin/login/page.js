@@ -8,6 +8,7 @@ import { setCredentials } from '@/lib/features/authSlice'
 import toast from 'react-hot-toast'
 import { ShieldCheck, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 export default function AdminLoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -23,7 +24,7 @@ export default function AdminLoginPage() {
       toast.success('Giriş başarılı')
       router.push('/admin/dashboard')
     } catch (err) {
-      toast.error(err.data?.message || 'Giriş başarısız')
+      toast.error(getErrorMessage(err, 'Giriş başarısız'), { duration: getToastDuration(err) })
     }
   }
 

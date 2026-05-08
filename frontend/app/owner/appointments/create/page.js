@@ -7,6 +7,7 @@ import { useGetServicesByDepartmentQuery } from '@/lib/services/serviceApi'
 import { useCreateAppointmentForCustomerMutation } from '@/lib/services/appointmentApi'
 import { toast } from 'react-hot-toast'
 import { ArrowLeft, Calendar, Clock, User, Phone, Mail, FileText } from 'lucide-react'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 export default function CreateAppointmentPage() {
   const router = useRouter()
@@ -105,7 +106,7 @@ export default function CreateAppointmentPage() {
       toast.success('Randevu başarıyla oluşturuldu!')
       router.push('/owner/appointments')
     } catch (error) {
-      toast.error(error?.data?.message || 'Randevu oluşturulurken hata oluştu')
+      toast.error(getErrorMessage(error, 'Randevu oluşturulurken hata oluştu'), { duration: getToastDuration(error) })
     }
   }
 

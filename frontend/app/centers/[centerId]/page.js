@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages';
 
 export default function CenterDetailPage() {
   const params = useParams();
@@ -83,7 +84,7 @@ export default function CenterDetailPage() {
       setComment('');
       setRating(5);
     } catch (error) {
-      toast.error(error?.data?.message || 'Yorum eklenirken hata oluştu');
+      toast.error(getErrorMessage(error, 'Yorum eklenirken hata oluştu'), { duration: getToastDuration(error) });
     }
   };
 
@@ -94,7 +95,7 @@ export default function CenterDetailPage() {
       await deleteComment(commentId).unwrap();
       toast.success('Yorum başarıyla silindi');
     } catch (error) {
-      toast.error(error?.data?.message || 'Yorum silinemedi');
+      toast.error(getErrorMessage(error, 'Yorum silinemedi'), { duration: getToastDuration(error) });
     }
   };
 

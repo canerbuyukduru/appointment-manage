@@ -24,6 +24,7 @@ import {
   Folder
 } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 function ServicesManager() {
   const params = useParams()
@@ -92,8 +93,7 @@ function ServicesManager() {
       }
       closeModal()
     } catch (error) {
-      console.error('Error:', error)
-      toast.error(error.data?.message || 'İşlem başarısız')
+      toast.error(getErrorMessage(error, 'İşlem başarısız'), { duration: getToastDuration(error) })
     }
   }
 
@@ -103,7 +103,7 @@ function ServicesManager() {
         await deleteService(id).unwrap()
         toast.success('Hizmet silindi!')
       } catch (error) {
-        toast.error('Silme işlemi başarısız')
+        toast.error(getErrorMessage(error, 'Silme işlemi başarısız'), { duration: getToastDuration(error) })
       }
     }
   }

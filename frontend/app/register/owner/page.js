@@ -6,6 +6,7 @@ import { useRegisterOwnerMutation } from '@/lib/services/authApi'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Building, ArrowLeft, CheckCircle, Clock, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 export default function OwnerRegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -26,7 +27,7 @@ export default function OwnerRegisterPage() {
       toast.success('İşletme sahibi kaydı başarılı! Admin onayından sonra giriş yapabilirsiniz.')
       router.push('/login')
     } catch (error) {
-      toast.error(error.data?.message || 'Kayıt başarısız')
+      toast.error(getErrorMessage(error, 'Kayıt başarısız'), { duration: getToastDuration(error) })
     }
   }
 

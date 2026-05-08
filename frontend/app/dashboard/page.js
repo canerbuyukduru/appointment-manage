@@ -13,6 +13,7 @@ import UserProfileModal from "@/components/UserProfileModal"; // Modal component
 
 import toast from "react-hot-toast";
 import { User, Building, Shield, Edit3 } from "lucide-react";
+import { getErrorMessage, getToastDuration } from "@/lib/utils/errorMessages";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import OwnerNavbar from "@/components/OwnerNavbar";
 import UserNavbar from "@/components/UserNavbar";
@@ -55,11 +56,7 @@ function DashboardContent() {
         handleCloseModal();
       }
     } catch (error) {
-      console.error("Profil güncelleme hatası:", error);
-      toast.error(
-        "Profil güncellenirken hata oluştu: " +
-          (error.data?.message || error.message)
-      );
+      toast.error(getErrorMessage(error, 'Profil güncellenirken hata oluştu'), { duration: getToastDuration(error) });
     }
   };
 
@@ -70,9 +67,7 @@ function DashboardContent() {
       toast.success("Başarıyla çıkış yapıldı");
       router.push("/login");
     } catch (error) {
-      toast.error(
-        "Çıkış yapılamadı: " + (error.data?.message || error.message)
-      );
+      toast.error(getErrorMessage(error, 'Çıkış yapılamadı'), { duration: getToastDuration(error) });
     }
   };
 

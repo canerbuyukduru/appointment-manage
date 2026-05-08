@@ -16,6 +16,7 @@ import {
   X
 } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 function DepartmentsManager() {
   const router = useRouter()
@@ -68,8 +69,7 @@ function DepartmentsManager() {
       }
       closeModal()
     } catch (error) {
-      console.error('Error:', error)
-      toast.error(error.data?.message || 'İşlem başarısız')
+      toast.error(getErrorMessage(error, 'İşlem başarısız'), { duration: getToastDuration(error) })
     }
   }
 
@@ -79,7 +79,7 @@ function DepartmentsManager() {
         await deleteDepartment(id).unwrap()
         toast.success('Departman silindi!')
       } catch (error) {
-        toast.error('Silme işlemi başarısız')
+        toast.error(getErrorMessage(error, 'Silme işlemi başarısız'), { duration: getToastDuration(error) })
       }
     }
   }

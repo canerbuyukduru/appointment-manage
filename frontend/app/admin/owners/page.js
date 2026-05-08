@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 export default function AdminOwnersPage() {
   const router = useRouter()
@@ -64,7 +65,7 @@ export default function AdminOwnersPage() {
       setNotes('')
       refetch()
     } catch (error) {
-      toast.error(error.data?.message || 'Onay işlemi başarısız')
+      toast.error(getErrorMessage(error, 'Onay işlemi başarısız'), { duration: getToastDuration(error) })
     }
   }
 
@@ -81,7 +82,7 @@ export default function AdminOwnersPage() {
       setNotes('')
       refetch()
     } catch (error) {
-      toast.error(error.data?.message || 'Red işlemi başarısız')
+      toast.error(getErrorMessage(error, 'Red işlemi başarısız'), { duration: getToastDuration(error) })
     }
   }
 

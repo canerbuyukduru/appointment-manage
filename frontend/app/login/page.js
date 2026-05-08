@@ -8,6 +8,7 @@ import { useLoginUserMutation, useLoginOwnerMutation } from '@/lib/services/auth
 import { setCredentials } from '@/lib/features/authSlice'
 import { Eye, EyeOff, User, Building, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -41,7 +42,7 @@ export default function LoginPage() {
         router.push('/dashboard')
       }
     } catch (error) {
-      toast.error(error.data?.message || 'Giriş yapılamadı')
+      toast.error(getErrorMessage(error, 'Giriş yapılamadı'), { duration: getToastDuration(error) })
     }
   }
 

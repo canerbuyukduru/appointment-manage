@@ -6,6 +6,7 @@ import { useRegisterUserMutation } from '@/lib/services/authApi'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, User, ArrowLeft, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { getErrorMessage, getToastDuration } from '@/lib/utils/errorMessages'
 
 export default function UserRegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -26,7 +27,7 @@ export default function UserRegisterPage() {
       toast.success('Kayıt başarılı! Şimdi giriş yapabilirsiniz.')
       router.push('/login')
     } catch (error) {
-      toast.error(error.data?.message || 'Kayıt işlemi başarısız')
+      toast.error(getErrorMessage(error, 'Kayıt işlemi başarısız'), { duration: getToastDuration(error) })
     }
   }
 
