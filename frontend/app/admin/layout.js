@@ -13,7 +13,7 @@ export default function AdminLayout({ children }) {
 
   return (
     <ProtectedRoute allowedRoles={['admin']}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-zinc-950">
         <AdminNavbar />
         <main>{children}</main>
       </div>

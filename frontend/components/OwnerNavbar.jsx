@@ -66,7 +66,7 @@ export default function OwnerNavbar() {
     : 'O'
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <nav className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo + Brand */}
@@ -75,8 +75,8 @@ export default function OwnerNavbar() {
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
                 <Building className="text-white" size={16} />
               </div>
-              <span className="font-bold text-gray-900 text-lg">BeautyBook</span>
-              <span className="hidden sm:block text-xs text-gray-500 bg-purple-50 px-2 py-0.5 rounded-full font-medium">Owner</span>
+              <span className="font-bold text-zinc-100 text-lg">BeautyBook</span>
+              <span className="hidden sm:block text-xs bg-purple-950/50 text-purple-400 border border-purple-900 px-2 py-0.5 rounded-full font-medium">Owner</span>
             </Link>
 
             {/* Desktop Nav Links */}
@@ -89,8 +89,8 @@ export default function OwnerNavbar() {
                     href={href}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       active
-                        ? 'bg-purple-50 text-purple-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? 'bg-purple-950 text-purple-400'
+                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                     }`}
                   >
                     <Icon size={16} />
@@ -105,7 +105,7 @@ export default function OwnerNavbar() {
           <div className="flex items-center gap-3">
             {/* Onay uyarısı */}
             {beautyCenter && !beautyCenter.isApproved && (
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg text-xs font-medium">
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-yellow-950/30 border border-yellow-900 text-yellow-400 rounded-lg text-xs font-medium">
                 <AlertTriangle size={14} />
                 Onay Bekleniyor
               </div>
@@ -115,49 +115,49 @@ export default function OwnerNavbar() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setProfileOpen((v) => !v)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800 transition-colors"
               >
                 <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                   {initials}
                 </div>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-medium text-gray-900 leading-none">{user?.fullName}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">İşletme Sahibi</p>
+                  <p className="text-sm font-medium text-zinc-100 leading-none">{user?.fullName}</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">İşletme Sahibi</p>
                 </div>
-                <ChevronDown size={16} className={`text-gray-400 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={16} className={`text-zinc-400 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl py-1 z-50">
                   {/* User info header */}
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900">{user?.fullName}</p>
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">{user?.email}</p>
+                  <div className="px-4 py-3 border-b border-zinc-800">
+                    <p className="text-sm font-semibold text-zinc-100">{user?.fullName}</p>
+                    <p className="text-xs text-zinc-400 mt-0.5 truncate">{user?.email}</p>
                   </div>
 
                   <div className="py-1">
                     <Link
                       href="/dashboard"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
                     >
-                      <User size={16} className="text-gray-400" />
+                      <User size={16} className="text-zinc-400" />
                       Profilim
                     </Link>
                     <Link
                       href="/owner/beauty-center"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
                     >
-                      <Building size={16} className="text-gray-400" />
+                      <Building size={16} className="text-zinc-400" />
                       İşletme Ayarları
                     </Link>
                   </div>
 
-                  <div className="border-t border-gray-100 py-1">
+                  <div className="border-t border-zinc-800 py-1">
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-zinc-800 transition-colors"
                     >
                       <LogOut size={16} />
                       Çıkış Yap
@@ -170,7 +170,7 @@ export default function OwnerNavbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileOpen((v) => !v)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-50 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 transition-colors"
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -180,7 +180,7 @@ export default function OwnerNavbar() {
 
       {/* Mobile Nav */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
+        <div className="md:hidden border-t border-zinc-800 bg-zinc-900 px-4 py-3 space-y-1">
           {navLinks.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || pathname.startsWith(href + '/')
             return (
@@ -190,8 +190,8 @@ export default function OwnerNavbar() {
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? 'bg-purple-50 text-purple-700'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-purple-950 text-purple-400'
+                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                 }`}
               >
                 <Icon size={18} />
@@ -199,10 +199,10 @@ export default function OwnerNavbar() {
               </Link>
             )
           })}
-          <div className="border-t border-gray-100 pt-2 mt-2">
+          <div className="border-t border-zinc-800 pt-2 mt-2">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-zinc-800 transition-colors"
             >
               <LogOut size={18} />
               Çıkış Yap

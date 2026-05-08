@@ -31,31 +31,28 @@ export default function CreateAppointmentPage() {
 
   const [createAppointmentForCustomer, { isLoading }] = useCreateAppointmentForCustomerMutation()
 
-  // Bugünden itibaren 30 gün için tarih seçenekleri
   const generateAvailableDates = () => {
     const dates = []
     const today = new Date()
-    
+
     for (let i = 0; i < 30; i++) {
       const date = new Date(today)
       date.setDate(today.getDate() + i)
       dates.push({
         value: date.toISOString().split('T')[0],
-        label: date.toLocaleDateString('tr-TR', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
+        label: date.toLocaleDateString('tr-TR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         })
       })
     }
     return dates
   }
 
-  // Saat seçenekleri (merkez çalışma saatlerine göre)
   const generateTimeSlots = () => {
     const slots = []
-    // Basit bir implementasyon - 09:00'dan 18:00'e kadar 30dk aralıklarla
     for (let hour = 9; hour < 18; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
@@ -76,7 +73,6 @@ export default function CreateAppointmentPage() {
     setFormData(prev => ({
       ...prev,
       [name]: value,
-      // Departman değiştiğinde servisi sıfırla
       ...(name === 'departmentId' && { serviceId: '' })
     }))
   }
@@ -84,7 +80,6 @@ export default function CreateAppointmentPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // Validasyon
     if (!formData.customerEmail && !formData.customerPhone) {
       toast.error('Müşteri email veya telefon bilgisi zorunludur')
       return
@@ -115,38 +110,38 @@ export default function CreateAppointmentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950">
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <button 
+          <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4"
+            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-200 mb-4 transition-colors"
           >
             <ArrowLeft size={20} />
             Geri Dön
           </button>
-          
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+
+          <h1 className="text-3xl font-bold text-zinc-100 mb-2">
             Müşteri İçin Randevu Oluştur
           </h1>
-          <p className="text-gray-600">
+          <p className="text-zinc-400">
             Müşteriniz adına yeni bir randevu oluşturun
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl">
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             {/* Müşteri Bilgileri */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <User className="text-blue-600" size={20} />
+            <div className="border-b border-zinc-800 pb-6">
+              <h3 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+                <User className="text-blue-400" size={20} />
                 Müşteri Bilgileri
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     Ad Soyad
                   </label>
                   <input
@@ -154,13 +149,13 @@ export default function CreateAppointmentPage() {
                     name="customerFullName"
                     value={formData.customerFullName}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
                     placeholder="Müşteri adı"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     <Mail className="inline mr-1" size={16} />
                     Email
                   </label>
@@ -169,13 +164,13 @@ export default function CreateAppointmentPage() {
                     name="customerEmail"
                     value={formData.customerEmail}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
                     placeholder="ornek@email.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     <Phone className="inline mr-1" size={16} />
                     Telefon
                   </label>
@@ -184,34 +179,34 @@ export default function CreateAppointmentPage() {
                     name="customerPhone"
                     value={formData.customerPhone}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
                     placeholder="0555 123 45 67"
                   />
                 </div>
               </div>
-              
-              <p className="text-sm text-gray-500 mt-2">
+
+              <p className="text-sm text-zinc-500 mt-2">
                 * Email veya telefon bilgilerinden en az biri zorunludur
               </p>
             </div>
 
             {/* Randevu Bilgileri */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Calendar className="text-purple-600" size={20} />
+            <div className="border-b border-zinc-800 pb-6">
+              <h3 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+                <Calendar className="text-purple-400" size={20} />
                 Randevu Bilgileri
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     Departman
                   </label>
                   <select
                     name="departmentId"
                     value={formData.departmentId}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                    className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none appearance-none transition-colors"
                     required
                   >
                     <option value="">Departman Seçin</option>
@@ -224,14 +219,14 @@ export default function CreateAppointmentPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     Hizmet
                   </label>
                   <select
                     name="serviceId"
                     value={formData.serviceId}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                    className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none appearance-none transition-colors disabled:opacity-50"
                     required
                     disabled={!formData.departmentId}
                   >
@@ -247,22 +242,22 @@ export default function CreateAppointmentPage() {
             </div>
 
             {/* Tarih ve Saat */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Clock className="text-green-600" size={20} />
+            <div className="border-b border-zinc-800 pb-6">
+              <h3 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+                <Clock className="text-green-400" size={20} />
                 Tarih ve Saat
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     Tarih
                   </label>
                   <select
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none appearance-none transition-colors"
                     required
                   >
                     <option value="">Tarih Seçin</option>
@@ -275,14 +270,14 @@ export default function CreateAppointmentPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     Saat
                   </label>
                   <select
                     name="time"
                     value={formData.time}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none appearance-none transition-colors"
                     required
                   >
                     <option value="">Saat Seçin</option>
@@ -298,7 +293,7 @@ export default function CreateAppointmentPage() {
 
             {/* Notlar */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-zinc-400 mb-2">
                 <FileText className="inline mr-1" size={16} />
                 Notlar (Opsiyonel)
               </label>
@@ -307,7 +302,7 @@ export default function CreateAppointmentPage() {
                 value={formData.notes}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
                 placeholder="Randevu ile ilgili notlar..."
               />
             </div>
@@ -317,15 +312,15 @@ export default function CreateAppointmentPage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-6 py-3 bg-zinc-700 hover:bg-zinc-600 text-zinc-200 rounded-lg transition-colors"
               >
                 İptal
               </button>
-              
+
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:from-purple-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isLoading ? 'Oluşturuluyor...' : 'Randevu Oluştur'}
               </button>
