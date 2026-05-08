@@ -6,9 +6,11 @@ import { useDispatch } from 'react-redux'
 import { useLoginAdminMutation } from '@/lib/services/adminApi'
 import { setCredentials } from '@/lib/features/authSlice'
 import toast from 'react-hot-toast'
+import { ShieldCheck, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AdminLoginPage() {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm()
+  const { register, handleSubmit, formState: { errors } } = useForm()
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const dispatch = useDispatch()
@@ -26,41 +28,69 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-sm w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Admin Girişi</h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              {...register('email', { required: 'Email gerekli' })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-red-500"
-              placeholder="admin@example.com"
-            />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-red-950 border border-red-900 rounded-2xl mb-4">
+            <ShieldCheck size={28} className="text-red-400" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
-            <div className="relative">
+          <h1 className="text-2xl font-bold text-zinc-50">Admin Girişi</h1>
+          <p className="text-zinc-500 text-sm mt-1">Yönetici paneline erişin</p>
+        </div>
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-2">E-posta</label>
               <input
-                type={showPassword ? 'text' : 'password'}
-                {...register('password', { required: 'Şifre gerekli' })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-red-500 pr-12"
-                placeholder="••••••••"
+                type="email"
+                {...register('email', { required: 'E-posta gerekli' })}
+                className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-xl outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                placeholder="admin@beautybook.com"
               />
-              <button type="button" onClick={() => setShowPassword(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-                {showPassword ? 'Gizle' : 'Göster'}
-              </button>
+              {errors.email && <p className="text-red-400 text-sm mt-1.5">{errors.email.message}</p>}
             </div>
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
-          </div>
-          <button type="submit" disabled={isLoading}
-            className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:opacity-50">
-            {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-          </button>
-        </form>
+
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-2">Şifre</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password', { required: 'Şifre gerekli' })}
+                  className="w-full px-4 py-3 pr-12 bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 rounded-xl outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-400 text-sm mt-1.5">{errors.password.message}</p>}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-red-600 text-white py-3 rounded-xl font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Giriş yapılıyor...
+                </div>
+              ) : 'Giriş Yap'}
+            </button>
+          </form>
+        </div>
+
+        <div className="text-center mt-6">
+          <Link href="/login" className="text-zinc-600 hover:text-zinc-400 text-sm transition-colors">
+            ← Kullanıcı Girişine Dön
+          </Link>
+        </div>
       </div>
     </div>
   )

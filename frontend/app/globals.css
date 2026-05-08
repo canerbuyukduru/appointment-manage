@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Gray scale — tamamen koyu temaya çevrildi */
+  --color-gray-50:  #1c1c22;
+  --color-gray-100: #27272a;
+  --color-gray-200: #3f3f46;
+  --color-gray-300: #52525b;
+  --color-gray-400: #71717a;
+  --color-gray-500: #a1a1aa;
+  --color-gray-600: #d4d4d8;
+  --color-gray-700: #e4e4e7;
+  --color-gray-800: #f4f4f5;
+  --color-gray-900: #fafafa;
+
+  /* Status renkleri — koyu arka plan için uyarlandı */
+  --color-blue-50:    #0a1628;
+  --color-blue-100:   #1e3a5f;
+  --color-blue-800:   #93c5fd;
+  --color-blue-900:   #bfdbfe;
+  --color-green-50:   #052916;
+  --color-green-100:  #14532d;
+  --color-green-800:  #86efac;
+  --color-green-900:  #bbf7d0;
+  --color-yellow-50:  #1c0e00;
+  --color-yellow-100: #2d1500;
+  --color-yellow-800: #fde047;
+  --color-yellow-900: #fef9c3;
+  --color-purple-50:  #1a0a2e;
+  --color-purple-100: #2d1065;
+  --color-red-50:     #200000;
+  --color-red-100:    #3b0000;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: #09090b;
+  color: #fafafa;
+  font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Input otomatik doldurma — koyu tema */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #27272a inset;
+  -webkit-text-fill-color: #f4f4f5;
+  transition: background-color 5000s ease-in-out 0s;
 }

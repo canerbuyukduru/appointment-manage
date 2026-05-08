@@ -127,14 +127,16 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-zinc-900 border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg"></div>
-              <h1 className="text-2xl font-bold text-gray-900">BeautyBook</h1>
+              <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs font-bold">B</span>
+              </div>
+              <h1 className="text-2xl font-bold text-zinc-50">BeautyBook</h1>
             </div>
             
             <div className="flex items-center gap-4">
@@ -142,7 +144,7 @@ export default function HomePage() {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setProfileOpen((v) => !v)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800 transition-colors"
                   >
                     <div className={`w-8 h-8 bg-gradient-to-r ${getAvatarGradient()} rounded-full flex items-center justify-center text-white text-xs font-bold`}>
                       {initials}
@@ -155,8 +157,8 @@ export default function HomePage() {
                   </button>
 
                   {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                      <div className="px-4 py-3 border-b border-gray-100">
+                    <div className="absolute right-0 mt-2 w-52 bg-zinc-900 rounded-xl shadow-xl border border-zinc-800 py-1 z-50">
+                      <div className="px-4 py-3 border-b border-zinc-800">
                         <p className="text-sm font-semibold text-gray-900">{user?.fullName}</p>
                         <p className="text-xs text-gray-500 mt-0.5 truncate">{user?.email}</p>
                       </div>
@@ -164,7 +166,7 @@ export default function HomePage() {
                         <Link
                           href={getDashboardLink()}
                           onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
                         >
                           <LayoutDashboard size={16} className="text-gray-400" />
                           Dashboard
@@ -172,7 +174,7 @@ export default function HomePage() {
                         <Link
                           href="/dashboard"
                           onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
                         >
                           <User size={16} className="text-gray-400" />
                           Profilim
@@ -181,7 +183,7 @@ export default function HomePage() {
                           <Link
                             href="/user/appointments"
                             onClick={() => setProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
                           >
                             <Calendar size={16} className="text-gray-400" />
                             Randevularım
@@ -191,7 +193,7 @@ export default function HomePage() {
                           <Link
                             href="/owner/beauty-center"
                             onClick={() => setProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
                           >
                             <Building size={16} className="text-gray-400" />
                             İşletmem
@@ -201,14 +203,14 @@ export default function HomePage() {
                           <Link
                             href="/admin/owners"
                             onClick={() => setProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
                           >
                             <ShieldCheck size={16} className="text-gray-400" />
                             Onay Bekleyenler
                           </Link>
                         )}
                       </div>
-                      <div className="border-t border-gray-100 py-1">
+                      <div className="border-t border-zinc-800 py-1">
                         <button
                           onClick={handleLogout}
                           className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -224,7 +226,7 @@ export default function HomePage() {
                 <div className="flex gap-2">
                   <Link
                     href="/login"
-                    className="text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="text-zinc-300 px-4 py-2 rounded-lg hover:bg-zinc-800 transition-colors"
                   >
                     Giriş Yap
                   </Link>
@@ -252,25 +254,25 @@ export default function HomePage() {
           </p>
           
           {/* Search Bar */}
-          <div className="max-w-4xl mx-auto bg-white rounded-xl p-2 flex gap-2">
+          <div className="max-w-4xl mx-auto bg-zinc-900/80 backdrop-blur border border-zinc-700 rounded-2xl p-2 flex gap-2">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500" size={20} />
               <input
                 type="text"
                 placeholder="Salon, hizmet ara..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 text-gray-900 rounded-lg focus:outline-none"
+                className="w-full pl-10 pr-4 py-3 bg-transparent text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none"
               />
             </div>
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500" size={20} />
               <input
                 type="text"
                 placeholder="Konum"
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
-                className="pl-10 pr-4 py-3 text-gray-900 rounded-lg focus:outline-none min-w-[160px]"
+                className="pl-10 pr-4 py-3 bg-transparent text-zinc-100 placeholder-zinc-500 rounded-xl focus:outline-none min-w-[160px]"
               />
             </div>
           </div>
@@ -288,10 +290,10 @@ export default function HomePage() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-sm p-6 animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded"></div>
+                <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 animate-pulse">
+                  <div className="h-4 bg-zinc-800 rounded mb-4"></div>
+                  <div className="h-3 bg-zinc-800 rounded mb-2"></div>
+                  <div className="h-3 bg-zinc-800 rounded"></div>
                 </div>
               ))}
             </div>
@@ -318,7 +320,7 @@ export default function HomePage() {
                 return (
                   <div
                     key={center._id}
-                    className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6"
+                    className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl transition-colors p-6"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div>
@@ -363,7 +365,7 @@ export default function HomePage() {
                     <div className="flex gap-3">
                       <button
                         onClick={() => router.push(`/centers/${center._id}`)}
-                        className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                        className="flex-1 border border-zinc-700 text-zinc-300 py-2 px-4 rounded-lg hover:bg-zinc-800 transition-colors text-sm font-medium"
                       >
                         Detayları Gör
                       </button>

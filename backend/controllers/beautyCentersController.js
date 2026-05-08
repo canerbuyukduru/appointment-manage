@@ -67,10 +67,9 @@ export const updateMyBeautyCenter = asyncHandler(async (req, res) => {
     throw new Error("Güzellik merkezi bulunamadı.");
   }
 
-  // sadece gelen alanları güncelle
-  const updates = req.body;
-  Object.keys(updates).forEach((key) => {
-    beautyCenter[key] = updates[key];
+  const ALLOWED = ['name', 'address', 'phone', 'email', 'description', 'location', 'workingHours', 'customHolidays'];
+  ALLOWED.forEach((k) => {
+    if (k in req.body) beautyCenter[k] = req.body[k];
   });
 
   const updatedCenter = await beautyCenter.save();

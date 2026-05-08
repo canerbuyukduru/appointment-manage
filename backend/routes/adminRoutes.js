@@ -15,11 +15,12 @@ import {
   logoutAdmin
 } from '../controllers/adminController.js';
 import { authenticate,authorizeAdmin } from '../middleware/authMiddleware.js';
+import { loginLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-// login 
-router.post('/login', loginAdmin);
+// login
+router.post('/login', loginLimiter, loginAdmin);
 
 // Tüm admin route'ları authenticate ve authorize gerektirir
 router.use(authenticate);

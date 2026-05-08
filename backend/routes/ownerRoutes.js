@@ -1,11 +1,12 @@
 import express from "express";
 import { registerOwner, loginOwner, logoutOwner, getOwnerAppointments,updateAppointmentStatus, ownerApproveAppointment, ownerRejectAppointment, ownerMarkAttendance, updateOwnerProfile, getOwnerProfile, createAppointmentForCustomer } from "../controllers/ownerController.js";
 import { authenticate, authorizeOwner} from "../middleware/authMiddleware.js";
+import { loginLimiter, registerLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
-router.post("/register", registerOwner);
-router.post("/login", loginOwner);
+router.post("/register", registerLimiter, registerOwner);
+router.post("/login", loginLimiter, loginOwner);
 router.post("/logout", authenticate, logoutOwner);
 router.get("/profile", authenticate, authorizeOwner, getOwnerProfile);
 router.put("/profile", authenticate, authorizeOwner, updateOwnerProfile);
